@@ -26,4 +26,15 @@ export const getViews = (views: Array<string>): Array<EViewType> => {
     : reverse(values(EViewType));
 };
 
+/**
+ * Gets the current view from string (default is week view)
+ * @param viewStr
+ * @returns EViewType with the selected view
+ */
+export const getViewFromString = (viewStr: string) => {
+  return lowerCase(viewStr) in EViewType
+    ? (lowerCase(viewStr) as EViewType)
+    : EViewType.week;
+};
+
 export default Views;

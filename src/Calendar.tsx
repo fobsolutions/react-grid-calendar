@@ -1,23 +1,24 @@
+import moment from 'moment';
 import React from 'react';
-import CalendarNav from './CalendarNav';
-import Views, { EViewType, getViews } from './Views';
-import { head } from 'lodash';
+import Views, { getViewFromString } from './Views';
 
 export interface CalendarProps {
-  views: Array<string>;
+  view: string;
+  displayDate: Date;
+  stepForwad: () => {}; // function to go a step forward
+  stepBack: () => {}; // function to go a step back
+  dateChanged: () => {}; // callback when the date was changed in the calendar
+  locale: string; // locale code to localize dates
 }
 
 const Calendar = (props: CalendarProps) => {
-  const views = getViews(props.views);
-  const [selectedView, setView] = React.useState<EViewType>(
-    head(views) || EViewType.week
-  );
-  const CalendarView = Views[selectedView];
+  const { view, displayDate } = props;
+
+  const CalendarView = Views[getViewFromString(view)];
 
   return (
     <div>
-      <CalendarNav onSelectView={setView} />
-      <CalendarView />
+      <CalendarView displayDate={displayDate || moment()} />
     </div>
   );
 };

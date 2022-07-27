@@ -25,4 +25,4 @@ const Template: Story<any> = args => <GridCalendar {...args} />;
 // https://storybook.js.org/docs/react/workflows/unit-testing
 export const Default = Template.bind({});
 
-Default.args = { views: ['week', 'month'] };
+Default.args = { view: 'months' };
