@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { GridCalendar } from '../src';
+import { columnsMock } from '../mocks/Columns';
 
 const meta: Meta = {
   title: 'Welcome',
@@ -19,10 +20,10 @@ const meta: Meta = {
 
 export default meta;
 
-const Template: Story<any> = args => <GridCalendar {...args} />;
+const Template: Story<any> = (args) => <GridCalendar {...args} />;
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing
 export const Default = Template.bind({});
 
-Default.args = { views: ['week', 'month'] };
+Default.args = { view: 'months', columns: columnsMock, locale: 'et' };

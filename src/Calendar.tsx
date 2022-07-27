@@ -1,23 +1,30 @@
+import moment from 'moment';
 import React from 'react';
-import CalendarNav from './CalendarNav';
-import Views, { EViewType, getViews } from './Views';
-import { head } from 'lodash';
+import { IGridColumn } from './SharedTypes';
+import Views, { getViewFromString } from './Views';
+import './Main.css';
 
 export interface CalendarProps {
-  views: Array<string>;
+  view: string;
+  displayDate?: Date;
+  stepForwad?: () => void; // function to go a step forward
+  stepBack?: () => void; // function to go a step back
+  dateChanged?: () => void; // callback when the date was changed in the calendar
+  locale?: string; // locale code to localize dates
+  columns?: Array<IGridColumn>; // grid columns
 }
 
 const Calendar = (props: CalendarProps) => {
-  const views = getViews(props.views);
-  const [selectedView, setView] = React.useState<EViewType>(
-    head(views) || EViewType.week
-  );
-  const CalendarView = Views[selectedView];
+  const { view, displayDate, columns, locale = 'en' } = props;
+
+  // this sets the moment.js locale for entire package
+  moment.locale(locale); // for english
+
+  const CalendarView = Views[getViewFromString(view)];
 
   return (
     <div>
-      <CalendarNav onSelectView={setView} />
-      <CalendarView />
+      <CalendarView displayDate={displayDate || moment()} columns={columns} />
     </div>
   );
 };

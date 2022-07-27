@@ -2,6 +2,14 @@
 
 React calendar package that supports weekly grid view with vertical columns that are very useful for displaying bookings through the week.
 
+## Installing
+
+Run
+
+```bash
+npm install # or yarn install - to also install dependencies
+```
+
 ## Commands
 
 The recommended workflow is to run TSDX in one terminal:
