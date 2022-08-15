@@ -1,0 +1,13 @@
+.day {
+    display: grid;
+    grid-template-columns: 1fr repeat(5, 3fr);
+}
+.day-col {
+    padding-right: 5px;
+}
+.day-weekday {
+    margin: 0px 0px 5px 0px;
+}
+.day-date {
+    margin: 0px;
+}
