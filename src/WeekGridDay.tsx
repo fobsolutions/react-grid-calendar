@@ -135,7 +135,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     refMap.set(m.format(refDateFormat), halfHourRef);
 
     return (
-      <div className="day-grid-row">
+      <div key={`hour-row-${i}`} className="day-grid-row">
         <div
           key={`hour-cell-${i}`}
           className="day-grid-cell day-grid-gutter day-grid-hour"
