@@ -12,15 +12,13 @@ export const getWeekDays = (sourceDate: Date): Array<Moment> => {
     .clone()
     .startOf('isoWeek');
 
-  return times(7, i => weekStart.clone().add(i, 'days'));
+  return times(7, (i) => weekStart.clone().add(i, 'days'));
 };
 
 export const generateRandomEvents = (count?: number) => {
   const weekDays = getWeekDays(moment().toDate());
   return times(count || random(0, 8), () => {
-    const startDate = moment(sample(weekDays))
-      .hours(random(8, 18))
-      .minutes(0);
+    const startDate = moment(sample(weekDays)).hours(random(8, 18)).minutes(0);
     const endDate = moment(startDate).add(random(1, 3) * 30, 'minutes');
 
     return {

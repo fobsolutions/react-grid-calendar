@@ -1,4 +1,4 @@
-import { IEvent, IGridColumn } from '../src/SharedTypes';
+import { IGridColumn } from '../src/SharedTypes';
 import { generateRandomEvents } from '../src/util';
 
 export const columnsMock: Array<IGridColumn> = [
@@ -20,6 +20,26 @@ export const columnsMock: Array<IGridColumn> = [
   },
   {
     label: 'Court 5',
+    events: generateRandomEvents(),
+  },
+
+  {
+    label: 'Court 6',
+    events: generateRandomEvents(),
+  },
+
+  {
+    label: 'Court 7',
+    events: generateRandomEvents(),
+  },
+
+  {
+    label: 'Court 8',
+    events: generateRandomEvents(),
+  },
+
+  {
+    label: 'Court 9',
     events: generateRandomEvents(),
   },
 ];

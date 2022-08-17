@@ -32,6 +32,10 @@ const WeekGridDay = (props: IGridDayProps) => {
     startElement: HTMLElement | null,
     endElement?: HTMLElement | null
   ): IEventRect => {
+    console.log('offsetLeft:' + startElement?.offsetLeft);
+    console.log(
+      'getBoundingClientRect.left:' + startElement?.getBoundingClientRect().left
+    );
     return {
       top: startElement?.offsetTop,
       left: startElement?.offsetLeft,
@@ -124,48 +128,106 @@ const WeekGridDay = (props: IGridDayProps) => {
     }
   }, [events]);
 
-  // display hours
-  const dayGrid = times(24, (i) => {
-    const h = moment(day).hour(i).minutes(0);
-    const m = moment(day).hour(i).minutes(30); // TODO: use a step property instead of 30 minutes
+  const dayGridSplit = () => {
+    const hours = times(24, (i) => {
+      const h = moment(day).hour(i).minutes(0);
+      const m = moment(day).hour(i).minutes(30); // TODO: use a step property instead of 30 minutes
 
-    const hourRef: RefObject<HTMLDivElement> = createRef();
-    refMap.set(h.format(refDateFormat), hourRef);
-    const halfHourRef: RefObject<HTMLDivElement> = createRef();
-    refMap.set(m.format(refDateFormat), halfHourRef);
+      const hourRef: RefObject<HTMLDivElement> = createRef();
+      refMap.set(h.format(refDateFormat), hourRef);
+      const halfHourRef: RefObject<HTMLDivElement> = createRef();
+      refMap.set(m.format(refDateFormat), halfHourRef);
 
-    return (
-      <div key={`hour-row-${i}`} className="day-grid-row">
+      return (
         <div
-          key={`hour-cell-${i}`}
-          className="day-grid-cell day-grid-gutter day-grid-hour"
+          key={`hour-row-${i}`}
+          className="day-grid-row"
+          style={{ backgroundColor: '#cecece' }}
         >
-          <div ref={hourRef}>{h.format('H:mm')}</div>
-          <div ref={halfHourRef}>{m.format('H:mm')}</div>
+          <div
+            key={`hour-cell-${i}`}
+            className="day-grid-cell day-grid-gutter day-grid-hour"
+          >
+            <div ref={hourRef}>{h.format('H:mm')}</div>
+            <div ref={halfHourRef}>{m.format('H:mm')}</div>
+          </div>
+          {/* This is where the grid used to be */}
         </div>
-        {gridColumns?.map((c: IGridColumn, i: number) => {
-          const hourCellRef: RefObject<HTMLDivElement> = createRef();
-          refMap.set(`${h.format(refDateFormat)}-${c.id}`, hourCellRef);
-          const halfHourCellRef: RefObject<HTMLDivElement> = createRef();
-          refMap.set(`${m.format(refDateFormat)}-${c.id}`, halfHourCellRef);
-          return (
-            <div className="day-grid-cell day-grid-col" key={`column-${i}`}>
+      );
+    });
+
+    const dayGrid = times(24, (indx) => {
+      // create hour and minutes
+      const h = moment(day).hour(indx).minutes(0);
+      const m = moment(day).hour(indx).minutes(30); // TODO: use a step property instead of 30 minutes
+
+      return (
+        <div className="day-grid" key={`grid-row-${indx}`}>
+          {gridColumns?.map((c: IGridColumn, i: number) => {
+            const hourCellRef: RefObject<HTMLDivElement> = createRef();
+            refMap.set(`${h.format(refDateFormat)}-${c.id}`, hourCellRef);
+            const halfHourCellRef: RefObject<HTMLDivElement> = createRef();
+            refMap.set(`${m.format(refDateFormat)}-${c.id}`, halfHourCellRef);
+            return (
+              <div className="day-grid-cell day-grid-col" key={`column-${i}`}>
+                <div
+                  className="day-grid-half-hour"
+                  key={`column-hour-${i}`}
+                  ref={hourCellRef}
+                >
+                  {c.id}
+                </div>
+                <div
+                  className="day-grid-half-hour"
+                  key={`column-half-hour-${i}`}
+                  ref={halfHourCellRef}
+                ></div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+
+    const eventsHtml = (
+      <div className="grid-events-wrapper">
+        <div className="grid-events">
+          <div>
+            {events.map((e: IEvent, i: number) => (
               <div
-                className="day-grid-half-hour"
-                key={`column-hour-${i}`}
-                ref={hourCellRef}
-              ></div>
-              <div
-                className="day-grid-half-hour"
-                key={`column-half-hour-${i}`}
-                ref={halfHourCellRef}
-              ></div>
-            </div>
-          );
-        })}
+                key={`event-${i}`}
+                className="calendar-event"
+                style={{
+                  backgroundColor: e.backgroundColor || 'white',
+                  position: 'absolute',
+                  top: `${e.rect.top}px`,
+                  left: `${e.rect.left}px`,
+                  width: `calc(${e.rect.width}px - 20px)`,
+                  height: `${e.rect.height}px`,
+                }}
+              >
+                <div className="calendar-event-body">
+                  <span className={`${e.labelClass}`}>
+                    {e.label} {moment(e.startDate).format('HH:mm')} {e.columnId}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
-  });
+
+    return (
+      <div className="day-grid">
+        <div className="day-grid-hours">{hours}</div>
+        <div className="day-grid-cols">
+          {eventsHtml}
+          {dayGrid}
+        </div>
+      </div>
+    );
+  };
 
   /**
    * Creates IEvent objects to use for rendering events on the grid
@@ -191,6 +253,8 @@ const WeekGridDay = (props: IGridDayProps) => {
       const gridElement = refMap.get(
         `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
       );
+      // console.log('event grid element:');
+      // console.log(gridElement);
       const endGridElement = refMap.get(
         `${moment(e.endDate)
           .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
@@ -218,16 +282,18 @@ const WeekGridDay = (props: IGridDayProps) => {
             <p className="day-date">{moment(day).format('MMMM-DD')}</p>
           </div>
         </div>
-        {columns?.map((c: IGridColumn, i: number) => (
-          <div key={`column-${i}`} className="day-grid-cell day-grid-col">
-            {c.label}
-          </div>
-        ))}
+        <div className="grid-header-cols">
+          {columns?.map((c: IGridColumn, i: number) => (
+            <div key={`column-${i}`} className="day-grid-cell day-grid-col">
+              {c.label}
+            </div>
+          ))}
+        </div>
       </div>
       <div className="day-container" ref={gridWrapper}>
         <div className="grid-container-events">
           {/* Events */}
-          <div className="grid-events-wrapper">
+          {/* <div className="grid-events-wrapper">
             <div className="grid-events">
               <div>
                 {events.map((e: IEvent, i: number) => (
@@ -244,14 +310,18 @@ const WeekGridDay = (props: IGridDayProps) => {
                     }}
                   >
                     <div className="calendar-event-body">
-                      <span className={`${e.labelClass}`}>{e.label}</span>
+                      <span className={`${e.labelClass}`}>
+                        {e.label} {moment(e.startDate).format('HH:mm')}{' '}
+                        {e.columnId}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-          <div ref={grid}>{dayGrid}</div>
+          </div> */}
+          {/* The grid */}
+          <div ref={grid}>{dayGridSplit()}</div>
         </div>
       </div>
     </div>

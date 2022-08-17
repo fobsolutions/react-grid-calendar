@@ -3,8 +3,7 @@
 }
 /* GRIDS */
 .day-grid {
-    display: grid;
-    grid-template-columns: 100px repeat(5, 3fr);
+    display: flex;
 }
 .day-header {
     display: grid;
@@ -30,15 +29,26 @@
     margin: 0px;
     text-transform: capitalize;
 }
+.grid-header-cols {
+    display: flex;
+    overflow-x: auto;
+}
+.day-grid-cols {
+    flex: 1;
+    overflow-x: auto;
+    position:relative;
+}
 .day-grid-col {
     display: flex;
     flex: 1;
     flex-direction: column;
+    min-width: 250px;
 }
 .day-grid-cell {
     background-color: white;
     border-right: 1px solid #dadce0;
     border-bottom: 1px solid #dadce0;
+    height: 70px;
 }
 .day-grid-half-hour {
     height:50%;
@@ -70,9 +80,11 @@
     width: 100%;
     height: 100%;
     position: absolute;
+    pointer-events: none;
 }
 .calendar-event {
-    
+    z-index: 1;
+    pointer-events: all;
 }
 .calendar-event-body {
     padding: 5px;
