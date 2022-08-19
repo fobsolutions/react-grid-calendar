@@ -44,9 +44,6 @@ describe('WeekGridDay', () => {
     const component = render(
       <WeekGridDay {...{ ...weekGridDayProps, columns: mockColumns }} />
     );
-
-    await waitFor(() => {
-      expect(component.getByText('renderedEvent')).toBeInTheDocument();
-    });
+    expect(component.getByText('renderedEvent')).toBeInTheDocument();
   });
 });

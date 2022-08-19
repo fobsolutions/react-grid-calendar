@@ -36,7 +36,7 @@
 .day-grid-cols {
     flex: 1;
     overflow-x: auto;
-    position:relative;
+    position: relative;
 }
 .day-grid-col {
     display: flex;
