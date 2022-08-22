@@ -26,4 +26,23 @@ const Template: Story<any> = (args) => <GridCalendar {...args} />;
 // https://storybook.js.org/docs/react/workflows/unit-testing
 export const Default = Template.bind({});
 
-Default.args = { view: 'months', columns: columnsMock, locale: 'et' };
+Default.args = {
+  view: 'months',
+  columns: columnsMock,
+  locale: 'et',
+  eventOnClick: (eventId: string) => {
+    console.log('clicked on ' + eventId);
+  },
+  eventRenderer: (eventId: string) => {
+    return (
+      <div
+        style={{ height: '100%', backgroundColor: '#e4e4e4', display: 'flex' }}
+      >
+        <div style={{ backgroundColor: 'blue', width: '5px' }}></div>
+        <div style={{ padding: '5px' }}>
+          <span>Event id: {eventId}</span>
+        </div>
+      </div>
+    );
+  },
+};

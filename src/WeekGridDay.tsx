@@ -16,7 +16,7 @@ import { IGridDayProps, IGridColumn, IEventRect, IEvent } from './SharedTypes';
  * Week Grid view day component
  */
 const WeekGridDay = (props: IGridDayProps) => {
-  const { day, columns } = props;
+  const { day, columns, eventRenderer, eventOnClick } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
   const gridWrapper = useRef<HTMLDivElement>(null);
@@ -62,6 +62,8 @@ const WeekGridDay = (props: IGridDayProps) => {
             startDate: moment(e.startDate).toDate(),
             endDate: moment(e.endDate).toDate(),
             columnId: colId,
+            renderer: eventRenderer,
+            onClick: eventOnClick,
           } as IEvent)
       )
       .filter((e: IEvent) => {
@@ -179,10 +181,14 @@ const WeekGridDay = (props: IGridDayProps) => {
               <div>
                 {events.map((e: IEvent, i: number) => (
                   <div
+                    onClick={() => {
+                      e.onClick ? e.onClick(e.eventId) : null;
+                    }}
+                    role="button"
                     key={`event-${i}`}
                     className="calendar-event"
                     style={{
-                      backgroundColor: e.backgroundColor || 'white',
+                      backgroundColor: e.backgroundColor || 'transparent',
                       position: 'absolute',
                       top: `${e.rect.top}px`,
                       left: `${e.rect.left}px`,
@@ -190,9 +196,13 @@ const WeekGridDay = (props: IGridDayProps) => {
                       height: `${e.rect.height}px`,
                     }}
                   >
-                    <div className="calendar-event-body">
-                      <span className={`${e.labelClass}`}>{e.label}</span>
-                    </div>
+                    {e.renderer ? (
+                      e.renderer(e.eventId)
+                    ) : (
+                      <div className="calendar-event-body">
+                        <span className={`${e.labelClass}`}>{e.label}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

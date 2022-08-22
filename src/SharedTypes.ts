@@ -1,7 +1,11 @@
+import { ReactElement } from 'react';
+
 export interface IViewProps {
   selectedDate: Date;
   locale: string;
   columns?: Array<IGridColumn>;
+  eventRenderer?: (eventId: string) => ReactElement;
+  eventOnClick?: (eventId: string) => void;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -9,6 +13,8 @@ export interface IGridDayProps {
   day: Date;
   columns?: Array<IGridColumn>;
   locale: string;
+  eventRenderer?: (eventId: string) => ReactElement;
+  eventOnClick?: (eventId: string) => void;
 }
 
 export interface IEvent {
@@ -22,6 +28,8 @@ export interface IEvent {
   labelClass: string;
   columnId: string;
   rect: IEventRect;
+  renderer: (eventId: string) => ReactElement;
+  onClick: (eventId: string) => void;
 }
 
 export interface IGridColumn {

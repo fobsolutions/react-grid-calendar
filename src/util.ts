@@ -22,6 +22,7 @@ export const generateRandomEvents = (count?: number) => {
     const endDate = moment(startDate).add(random(1, 3) * 30, 'minutes');
 
     return {
+      eventId: `${random(999, 9999)}-${random(999, 9999)}-${random(999, 9999)}`,
       startDate: startDate.toDate(),
       endDate: endDate.toDate(),
       label: `Level ${random(1, 8)}`,
