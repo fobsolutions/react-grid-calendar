@@ -55,3 +55,70 @@ TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rol
 ### TypeScript
 
 `tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
+
+## Usage
+
+To use the calendar you need to specify the **columns that contain the events**. See _stories/GridCalendar.strories.tsx_ for example. Your data should look something like this:
+
+```
+const columns = [
+  {
+    label: 'Court 1',
+    events: [
+        {
+            eventId: '0000-0000-0000',
+            startDate: '2022-08-01 12:00:00',
+            endDate: '2022-08-01 13:00:00',
+            label: `Level 1`,
+            backgroundColor: `#0000ff`,
+        },
+        {
+            eventId: '0000-0000-0001',
+            startDate: '2022-08-01 15:00:00',
+            endDate: '2022-08-01 16:00:00',
+            label: `Level 1`,
+            backgroundColor: `#0000ff`,
+        }
+    ],
+  }
+];
+
+<GridCalendar
+    columns={columns}
+/>
+```
+
+This will render one column that has 2 events.
+
+### Events rendering
+
+You can chose to render the events using custom renderer function by passing the **eventRenderer** function that accepts one parameter **eventId**.
+
+```
+<GridCalendar
+    columns={columns}
+    eventRenderer={(eventId) => (<div>Event id: {eventId}</div>)}
+/>
+```
+
+### Listening to event clicks
+
+You can listen to event clicks by specifying the **eventOnClick** paramter to the component. Just like renderer function it accepts one parameter **eventId**.
+
+```
+<GridCalendar
+    columns={columns}
+    eventOnClick={(eventId) => console.log('clicked event: + eventId')}
+/>
+```
+
+### Specifying the locale
+
+To specify the locale to be used in the calendar simply specify 2-letter locale code like 'en', 'es' etc. Default locale is 'en';
+
+```
+<GridCalendar
+    columns={columns}
+    locale='es'
+/>
+```

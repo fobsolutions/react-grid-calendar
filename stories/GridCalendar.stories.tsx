@@ -1,5 +1,6 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
+import { flatten } from 'lodash';
 import { GridCalendar } from '../src';
 import { columnsMock } from '../mocks/Columns';
 
@@ -38,7 +39,14 @@ Default.args = {
       <div
         style={{ height: '100%', backgroundColor: '#e4e4e4', display: 'flex' }}
       >
-        <div style={{ backgroundColor: 'blue', width: '5px' }}></div>
+        <div
+          style={{
+            backgroundColor: flatten(
+              columnsMock.map((col) => col.events)
+            ).filter((e) => e.eventId === eventId)[0].backgroundColor,
+            width: '5px',
+          }}
+        ></div>
         <div style={{ padding: '5px' }}>
           <span>Event id: {eventId}</span>
         </div>
