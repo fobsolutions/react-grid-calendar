@@ -4,7 +4,7 @@ export interface IViewProps {
   selectedDate: Date;
   locale: string;
   columns?: Array<IGridColumn>;
-  eventRenderer?: (eventId: string) => ReactElement;
+  eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
 }
 
@@ -13,7 +13,7 @@ export interface IGridDayProps {
   day: Date;
   columns?: Array<IGridColumn>;
   locale: string;
-  eventRenderer?: (eventId: string) => ReactElement;
+  eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
 }
 
@@ -28,8 +28,9 @@ export interface IEvent {
   labelClass: string;
   columnId: string;
   rect: IEventRect;
-  renderer: (eventId: string) => ReactElement;
+  renderer: (event: IEvent) => ReactElement;
   onClick: (eventId: string) => void;
+  duration: number; // duration in minutes
 }
 
 export interface IGridColumn {
@@ -43,4 +44,9 @@ export interface IEventRect {
   left: number;
   width: number;
   height: number;
+}
+
+export interface ITimeGap {
+  from: Date;
+  to: Date;
 }

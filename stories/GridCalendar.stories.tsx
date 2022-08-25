@@ -1,8 +1,9 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
-import { flatten } from 'lodash';
 import { GridCalendar } from '../src';
 import { columnsMock } from '../mocks/Columns';
+import { IEvent } from '../src/SharedTypes';
+import moment from 'moment';
 
 const meta: Meta = {
   title: 'Welcome',
@@ -34,21 +35,22 @@ Default.args = {
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
   },
-  eventRenderer: (eventId: string) => {
+  eventRenderer: (event: IEvent) => {
     return (
       <div
         style={{ height: '100%', backgroundColor: '#e4e4e4', display: 'flex' }}
       >
         <div
           style={{
-            backgroundColor: flatten(
-              columnsMock.map((col) => col.events)
-            ).filter((e) => e.eventId === eventId)[0].backgroundColor,
+            backgroundColor: event.backgroundColor,
             width: '5px',
           }}
         ></div>
         <div style={{ padding: '5px' }}>
-          <span>Event id: {eventId}</span>
+          <span>
+            Start: {moment(event.startDate).format('HH:mm')} End:
+            {moment(event.endDate).format('HH:mm')}
+          </span>
         </div>
       </div>
     );

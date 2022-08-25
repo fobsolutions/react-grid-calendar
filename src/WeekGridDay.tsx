@@ -6,11 +6,18 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { times } from 'lodash';
+import { times, flatten, head, last, range, sortBy } from 'lodash';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
 
-import { IGridDayProps, IGridColumn, IEventRect, IEvent } from './SharedTypes';
+import {
+  IGridDayProps,
+  IGridColumn,
+  IEventRect,
+  IEvent,
+  ITimeGap,
+} from './SharedTypes';
+import { checkForEvents, isCollapsed } from './util';
 
 /**
  * Week Grid view day component
@@ -19,6 +26,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   const { day, columns, eventRenderer, eventOnClick } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
+  const [gaps, setGaps] = useState<ITimeGap[]>([]);
   const gridWrapper = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const gridHeadrCols = useRef<HTMLDivElement>(null);
@@ -79,6 +87,32 @@ const WeekGridDay = (props: IGridDayProps) => {
       });
   };
 
+  /**
+   * Creates positions the events according to their hour/column cell
+   * @param cols
+   * @returns a list of IEvent-s with rect param
+   */
+  const positionEvents = (eventList: IEvent[]): IEvent[] => {
+    return eventList.map((e: IEvent) => {
+      const gridElement = refMap.get(
+        `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
+      );
+      const endGridElement = refMap.get(
+        `${moment(e.endDate)
+          .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
+          .format(refDateFormat)}-${e.columnId}`
+      );
+
+      return {
+        ...e,
+        rect: getElementRect(
+          gridElement?.current as HTMLElement,
+          endGridElement?.current as HTMLElement
+        ),
+      } as IEvent;
+    });
+  };
+
   useEffect(() => {
     if (columns?.length && !gridColumns?.length) {
       // process columns
@@ -97,9 +131,44 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, []);
 
   useEffect(() => {
-    const evs: IEvent[] = createEvents(gridColumns);
-    setEvents(evs);
+    const gaps: ITimeGap[] = [];
+    const flatEvents = flatten(
+      gridColumns.map((col: IGridColumn) => col.events)
+    );
+    const sortedEvents = sortBy(flatEvents, ['startDate']);
+
+    // loop through hours and see if there are some events that end or start in that hour
+    // start with earliest event
+    const earliestHour = moment(head(sortedEvents)?.startDate).hour();
+    const latestHour = moment(last(sortedEvents)?.endDate).hour();
+
+    // see if event starts or ends in the range hour + 1
+    range(earliestHour, latestHour).forEach((hour: number) => {
+      // using evt.startDate simply to create a correct date
+      const hourStart = moment(head(sortedEvents)?.startDate)
+        .clone()
+        .hours(hour);
+      const hourEnd = hourStart.clone().hours(hour + 1);
+
+      if (!checkForEvents(sortedEvents, hourStart, hourEnd)) {
+        gaps.push({
+          from: hourStart.toDate(),
+          to: hourEnd.toDate(),
+        });
+      }
+    });
+
+    setGaps(gaps);
   }, [gridColumns]);
+
+  useEffect(() => {
+    const flatEvents = flatten(
+      gridColumns.map((col: IGridColumn) => col.events)
+    );
+    const evs: IEvent[] = positionEvents(flatEvents);
+
+    setEvents(evs);
+  }, [gaps]);
 
   useEffect(() => {
     if (events.length) {
@@ -122,10 +191,11 @@ const WeekGridDay = (props: IGridDayProps) => {
 
       const firstElementTop: number = firstEventOffsetTop - parentOffsetTop;
 
-      // scroll the grid to first event
-      gridWrapper?.current?.scrollTo({
-        top: firstElementTop,
-      });
+      if (firstElementTop !== 0) {
+        gridWrapper?.current?.scrollTo({
+          top: firstElementTop,
+        });
+      }
     }
   }, [events]);
 
@@ -151,12 +221,15 @@ const WeekGridDay = (props: IGridDayProps) => {
       const halfHourRef: RefObject<HTMLDivElement> = createRef();
       refMap.set(m.format(refDateFormat), halfHourRef);
 
-      return (
+      return isCollapsed(h, gaps) ? ( // if the hour needs to be collapsed
         <div
           key={`hour-row-${i}`}
-          className="day-grid-row"
-          style={{ backgroundColor: '#cecece' }}
-        >
+          className={`${
+            !isCollapsed(h.subtract(1, 'hour'), gaps) ? 'collapsed' : ''
+          }`}
+        ></div>
+      ) : (
+        <div key={`hour-row-${i}`} className="day-grid-row">
           <div
             key={`hour-cell-${i}`}
             className="day-grid-cell day-grid-gutter day-grid-hour"
@@ -197,7 +270,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                     }}
                   >
                     {e.renderer ? (
-                      e.renderer(e.eventId)
+                      e.renderer(e)
                     ) : (
                       <div className="calendar-event-body">
                         <span className={`${e.labelClass}`}>{e.label}</span>
@@ -213,9 +286,18 @@ const WeekGridDay = (props: IGridDayProps) => {
             const h = moment(day).hour(indx).minutes(0);
             const m = moment(day).hour(indx).minutes(30); // TODO: use a step property instead of 30 minutes
 
-            return (
+            return isCollapsed(h, gaps) ? ( // check if hour needs to be collapsed
+              <div
+                key={`collapsed-row-${indx}`}
+                className={`${
+                  !isCollapsed(h.subtract(1, 'hour'), gaps) ? 'collapsed' : ''
+                }`}
+              ></div>
+            ) : (
               <div className="day-grid" key={`grid-row-${indx}`}>
                 {gridColumns?.map((c: IGridColumn, i: number) => {
+                  // see if hour falls into the gap
+
                   const hourCellRef: RefObject<HTMLDivElement> = createRef();
                   refMap.set(`${h.format(refDateFormat)}-${c.id}`, hourCellRef);
                   const halfHourCellRef: RefObject<HTMLDivElement> =
@@ -248,48 +330,6 @@ const WeekGridDay = (props: IGridDayProps) => {
         </div>
       </div>
     );
-  };
-
-  /**
-   * Creates IEvent objects to use for rendering events on the grid
-   * @param cols
-   * @returns
-   */
-  const createEvents = (cols: IGridColumn[]): IEvent[] => {
-    const eventList: Array<IEvent> = new Array<IEvent>();
-    if (!cols.length) {
-      return [];
-    }
-    cols?.forEach((column) => {
-      column.events.forEach((e: IEvent) => {
-        eventList.push({
-          ...e,
-          startDate: moment(e.startDate).toDate(),
-          endDate: moment(e.endDate).toDate(),
-        } as IEvent);
-      });
-    });
-
-    return eventList.map((e: IEvent) => {
-      const gridElement = refMap.get(
-        `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
-      );
-      // console.log('event grid element:');
-      // console.log(gridElement);
-      const endGridElement = refMap.get(
-        `${moment(e.endDate)
-          .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
-          .format(refDateFormat)}-${e.columnId}`
-      );
-
-      return {
-        ...e,
-        rect: getElementRect(
-          gridElement?.current as HTMLElement,
-          endGridElement?.current as HTMLElement
-        ),
-      } as IEvent;
-    });
   };
 
   return (

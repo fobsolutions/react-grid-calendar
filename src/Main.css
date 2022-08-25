@@ -46,7 +46,6 @@
     min-width: 250px;
 }
 .day-grid-cell {
-    background-color: white;
     border-right: 1px solid #dadce0;
     border-bottom: 1px solid #dadce0;
     height: 70px;
@@ -89,4 +88,7 @@
 }
 .calendar-event-body {
     padding: 5px;
+}
+.collapsed {
+    border-top: 3px solid #8999A8;
 }
