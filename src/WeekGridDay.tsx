@@ -253,7 +253,7 @@ const WeekGridDay = (props: IGridDayProps) => {
       <div className="day-grid">
         <div className="day-grid-hours">{hours}</div>
         <div
-          className="day-grid-cols"
+          className="day-grid-cols scroll-panel"
           ref={dayGridCols}
           onScroll={scrollHeader}
         >
@@ -352,7 +352,7 @@ const WeekGridDay = (props: IGridDayProps) => {
           </div>
         </div>
         <div
-          className="grid-header-cols"
+          className="grid-header-cols scroll-panel"
           ref={gridHeadrCols}
           onScroll={scrollGrid}
         >
@@ -363,7 +363,7 @@ const WeekGridDay = (props: IGridDayProps) => {
           ))}
         </div>
       </div>
-      <div className="day-container" ref={gridWrapper}>
+      <div className="day-container scroll-panel" ref={gridWrapper}>
         <div className="grid-container-events">
           <div ref={grid}>{dayGrid()}</div>
         </div>
