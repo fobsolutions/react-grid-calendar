@@ -92,23 +92,34 @@ This will render one column that has 2 events.
 
 ### Events rendering
 
-You can chose to render the events using custom renderer function by passing the **eventRenderer** function that accepts one parameter **eventId**.
+You can chose to render the events using custom renderer function by passing the **eventRenderer** function that accepts one parameter **event**.
 
 ```
 <GridCalendar
     columns={columns}
-    eventRenderer={(eventId) => (<div>Event id: {eventId}</div>)}
+    eventRenderer={(event) => (<div>Event: {event.eventId}</div>)}
 />
 ```
 
 ### Listening to event clicks
 
-You can listen to event clicks by specifying the **eventOnClick** paramter to the component. Just like renderer function it accepts one parameter **eventId**.
+You can listen to event clicks by specifying the **eventOnClick** paramter to the component. Just like renderer function it accepts one parameter **event**.
 
 ```
 <GridCalendar
     columns={columns}
-    eventOnClick={(eventId) => console.log('clicked event: + eventId')}
+    eventOnClick={(event) => console.log('clicked event: + event.eventId')}
+/>
+```
+
+### Column header rendering
+
+You can chose to render the column header using custom renderer function by passing the **columnHeaderRenderer** function that accepts one parameter **column**.
+
+```
+<GridCalendar
+    columns={columns}
+    columnHeaderRenderer={(event) => (<div>{column.label} ({column.events.length})</div>)}
 />
 ```
 

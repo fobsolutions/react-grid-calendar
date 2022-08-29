@@ -2,7 +2,7 @@ import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { GridCalendar } from '../src';
 import { columnsMock } from '../mocks/Columns';
-import { IEvent } from '../src/SharedTypes';
+import { IEvent, IGridColumn } from '../src/SharedTypes';
 import moment from 'moment';
 
 const meta: Meta = {
@@ -54,5 +54,8 @@ Default.args = {
         </div>
       </div>
     );
+  },
+  columnHeaderRenderer: (column: IGridColumn) => {
+    return `${column.label} (${column.events.length})`;
   },
 };

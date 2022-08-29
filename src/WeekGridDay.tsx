@@ -23,7 +23,14 @@ import { checkForEvents, isCollapsed } from './util';
  * Week Grid view day component
  */
 const WeekGridDay = (props: IGridDayProps) => {
-  const { day, columns, eventRenderer, eventOnClick } = props;
+  const {
+    day,
+    columns,
+    eventRenderer,
+    eventOnClick,
+    editMode,
+    columnHeaderRenderer,
+  } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [gaps, setGaps] = useState<ITimeGap[]>([]);
@@ -221,13 +228,15 @@ const WeekGridDay = (props: IGridDayProps) => {
       const halfHourRef: RefObject<HTMLDivElement> = createRef();
       refMap.set(m.format(refDateFormat), halfHourRef);
 
-      return isCollapsed(h, gaps) ? ( // if the hour needs to be collapsed
+      return isCollapsed(h, gaps) && !editMode ? ( // if the hour needs to be collapsed
         <div
           key={`hour-row-${i}`}
           className={`${
             !isCollapsed(h.subtract(1, 'hour'), gaps) ? 'collapsed' : ''
           }`}
-        ></div>
+        >
+          <div></div>
+        </div>
       ) : (
         <div key={`hour-row-${i}`} className="day-grid-row">
           <div
@@ -237,7 +246,6 @@ const WeekGridDay = (props: IGridDayProps) => {
             <div ref={hourRef}>{h.format('H:mm')}</div>
             <div ref={halfHourRef}>{m.format('H:mm')}</div>
           </div>
-          {/* This is where the grid used to be */}
         </div>
       );
     });
@@ -286,18 +294,18 @@ const WeekGridDay = (props: IGridDayProps) => {
             const h = moment(day).hour(indx).minutes(0);
             const m = moment(day).hour(indx).minutes(30); // TODO: use a step property instead of 30 minutes
 
-            return isCollapsed(h, gaps) ? ( // check if hour needs to be collapsed
+            return isCollapsed(h, gaps) && !editMode ? ( // check if hour needs to be collapsed
               <div
                 key={`collapsed-row-${indx}`}
                 className={`${
                   !isCollapsed(h.subtract(1, 'hour'), gaps) ? 'collapsed' : ''
                 }`}
-              ></div>
+              >
+                <div></div>
+              </div>
             ) : (
               <div className="day-grid" key={`grid-row-${indx}`}>
                 {gridColumns?.map((c: IGridColumn, i: number) => {
-                  // see if hour falls into the gap
-
                   const hourCellRef: RefObject<HTMLDivElement> = createRef();
                   refMap.set(`${h.format(refDateFormat)}-${c.id}`, hourCellRef);
                   const halfHourCellRef: RefObject<HTMLDivElement> =
@@ -350,7 +358,7 @@ const WeekGridDay = (props: IGridDayProps) => {
         >
           {columns?.map((c: IGridColumn, i: number) => (
             <div key={`column-${i}`} className="day-grid-cell day-grid-col">
-              {c.label}
+              {columnHeaderRenderer ? columnHeaderRenderer(c) : c.label}
             </div>
           ))}
         </div>

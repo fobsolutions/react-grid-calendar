@@ -22,7 +22,6 @@ export const columnsMock: Array<IGridColumn> = [
     label: 'Court 5',
     events: generateRandomEvents(),
   },
-
   {
     label: 'Court 6',
     events: generateRandomEvents(),

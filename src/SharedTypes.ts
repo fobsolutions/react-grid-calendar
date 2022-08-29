@@ -6,6 +6,8 @@ export interface IViewProps {
   columns?: Array<IGridColumn>;
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
+  columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  editMode: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -15,6 +17,8 @@ export interface IGridDayProps {
   locale: string;
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
+  columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  editMode?: boolean;
 }
 
 export interface IEvent {

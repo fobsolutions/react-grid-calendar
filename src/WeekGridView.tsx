@@ -7,7 +7,15 @@ import WeekGridDay from './WeekGridDay';
  * A weekly grid view
  */
 const WeekGridView = (props: IViewProps) => {
-  const { selectedDate, locale, columns, eventRenderer, eventOnClick } = props;
+  const {
+    selectedDate,
+    locale,
+    columns,
+    eventRenderer,
+    eventOnClick,
+    columnHeaderRenderer,
+    editMode,
+  } = props;
   const weekDays = getWeekDays(selectedDate);
   return (
     <div>
@@ -17,8 +25,10 @@ const WeekGridView = (props: IViewProps) => {
           day={weekDay.toDate()}
           columns={columns}
           locale={locale}
+          editMode={editMode}
           eventRenderer={eventRenderer}
           eventOnClick={eventOnClick}
+          columnHeaderRenderer={columnHeaderRenderer}
         />
       ))}
     </div>

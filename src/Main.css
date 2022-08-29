@@ -15,7 +15,24 @@
 /* GRIDS */
 .day-container {
     max-height: 450px;
-    overflow-y: scroll;
+    overflow-y: hidden;
+}
+.day-container:hover {
+    overflow-y: overlay;
+}
+.day-container::-webkit-scrollbar {
+    background: transparent;
+    height: 8px;
+    width: 8px;
+}
+.day-container::-webkit-scrollbar-thumb {
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: #dadce0;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    min-height: 40px;
 }
 .grid-container-events {
     position: relative;
@@ -32,7 +49,24 @@
 .grid-header-cols {
     display: flex;
     flex: 1;
-    overflow-x: auto;
+    overflow-x: hidden;
+}
+.grid-header-cols:hover {
+    overflow-x: overlay;
+}
+.grid-header-cols::-webkit-scrollbar {
+    background: transparent;
+    height: 8px;
+    width: 8px;
+}
+.grid-header-cols::-webkit-scrollbar-thumb {
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: #dadce0;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    min-height: 40px;
 }
 .day-grid-cols {
     flex: 1;
@@ -90,5 +124,12 @@
     padding: 5px;
 }
 .collapsed {
+    height: 3px;
+    display: flex;
+    align-items: center;
+}
+.collapsed > div {
     border-top: 3px solid #8999A8;
+    width: 100%;
+    position: absolute;
 }
