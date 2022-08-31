@@ -22,7 +22,7 @@ This builds to `/dist` and runs the project in watch mode so any edits you save 
 
 Then run either Storybook or the example playground:
 
-### Storybook
+## Storybook
 
 Run inside another terminal:
 
@@ -36,7 +36,7 @@ This loads the stories from `./stories`.
 
 > NOTE: If you troubles running the storybook described in [here](https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported) try running the following command: `export NODE_OPTIONS=--openssl-legacy-provider`
 
-### Tests
+## Tests
 
 To run tests:
 
@@ -48,17 +48,21 @@ npm t
 
 Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
 
-### Rollup
+## Rollup
 
 TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
 
-### TypeScript
+## TypeScript
 
 `tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
 
 ## Usage
 
-To use the calendar you need to specify the **columns that contain the events**. See _stories/GridCalendar.strories.tsx_ for example. Your data should look something like this:
+Currently there are 2 views, Week Grid view (default) and simple Week view. To use week view simply specify the parameter view like so: `view="week"`
+
+### Week Grid view
+
+You need to specify the **columns that contain the events** (See _stories/GridCalendar.strories.tsx_ for example). In this case your data should look something like this:
 
 ```
 const columns = [
@@ -90,7 +94,50 @@ const columns = [
 
 This will render one column that has 2 events.
 
-### Events rendering
+### Week view
+
+You need to specify the list of events; Example:
+
+```
+const events = [
+        {
+            eventId: '0000-0000-0000',
+            startDate: '2022-08-01 12:00:00',
+            endDate: '2022-08-01 13:00:00',
+            label: `Level 1`,
+            backgroundColor: `#0000ff`,
+        },
+        {
+            eventId: '0000-0000-0001',
+            startDate: '2022-08-01 15:00:00',
+            endDate: '2022-08-01 16:00:00',
+            label: `Level 1`,
+            backgroundColor: `#0000ff`,
+        }
+    ],
+
+<GridCalendar
+    events={events}
+    view="week"
+/>
+```
+
+This will render the week view with 2 events.
+
+## Display date
+
+The calendar library does not provide the UI to change the displayed week instead you can develop your own UI and simply specify the display date using the **displayDate** parameter and the library will display the week that this date falls into. Example:
+
+```
+<GridCalendar
+    columns={columns}
+    displayDate={new Date('2000-01-01')}
+/>
+```
+
+This will render the week that 1st of January 2000 falls onto.
+
+## Events rendering
 
 You can chose to render the events using custom renderer function by passing the **eventRenderer** function that accepts one parameter **event**.
 
@@ -101,7 +148,7 @@ You can chose to render the events using custom renderer function by passing the
 />
 ```
 
-### Listening to event clicks
+## Listening to event clicks
 
 You can listen to event clicks by specifying the **eventOnClick** paramter to the component. Just like renderer function it accepts one parameter **event**.
 
@@ -112,7 +159,7 @@ You can listen to event clicks by specifying the **eventOnClick** paramter to th
 />
 ```
 
-### Column header rendering
+## Column header rendering
 
 You can chose to render the column header using custom renderer function by passing the **columnHeaderRenderer** function that accepts one parameter **column**.
 
@@ -123,7 +170,7 @@ You can chose to render the column header using custom renderer function by pass
 />
 ```
 
-### Specifying the locale
+## Specifying the locale
 
 To specify the locale to be used in the calendar simply specify 2-letter locale code like 'en', 'es' etc. Default locale is 'en';
 

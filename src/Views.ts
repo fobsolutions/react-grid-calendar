@@ -1,5 +1,6 @@
 import MonthView from './MonthView';
 import WeekGridView from './WeekGridView';
+import WeekView from './WeekView';
 
 export enum EViewType {
   month = 'month',
@@ -9,7 +10,7 @@ export enum EViewType {
 
 const Views: { [key in EViewType]: React.ElementType } = {
   month: MonthView,
-  week: WeekGridView,
+  week: WeekView,
   weekgrid: WeekGridView,
 };
 

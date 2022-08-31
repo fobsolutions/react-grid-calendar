@@ -14,4 +14,16 @@ describe('GridCalendar', () => {
     const weekdays = calendar.getAllByTestId('weekday');
     expect(weekdays[0]).toHaveTextContent('lunes');
   });
+
+  it('renders with correct specified date', () => {
+    const calendar = render(
+      <GridCalendar
+        view="weekGrid"
+        locale="et"
+        displayDate={new Date('2022-02-02')}
+      />
+    );
+    const cornerDates = calendar.getAllByTestId('cornerDate');
+    expect(cornerDates[2]).toHaveTextContent('veebruar-02');
+  });
 });

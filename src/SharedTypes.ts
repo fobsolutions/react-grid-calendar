@@ -4,10 +4,11 @@ export interface IViewProps {
   selectedDate: Date;
   locale: string;
   columns?: Array<IGridColumn>;
+  events?: Array<IEvent>;
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
-  editMode: boolean;
+  editMode?: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -19,6 +20,7 @@ export interface IGridDayProps {
   eventOnClick?: (eventId: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
+  weekMode?: boolean;
 }
 
 export interface IEvent {
@@ -38,9 +40,10 @@ export interface IEvent {
 }
 
 export interface IGridColumn {
-  id?: string;
   label: string;
   events: Array<IEvent>;
+  id?: string;
+  date?: Date;
 }
 
 export interface IEventRect {

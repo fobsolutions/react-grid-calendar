@@ -30,6 +30,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     eventOnClick,
     editMode,
     columnHeaderRenderer,
+    weekMode,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -69,29 +70,32 @@ const WeekGridDay = (props: IGridDayProps) => {
    * @returns
    */
   const convertEvents = (events: IEvent[], colId: string) => {
-    return events
-      .map(
-        (e: IEvent) =>
-          ({
-            ...e,
-            startDate: moment(e.startDate).toDate(),
-            endDate: moment(e.endDate).toDate(),
-            columnId: colId,
-            renderer: eventRenderer,
-            onClick: eventOnClick,
-          } as IEvent)
-      )
-      .filter((e: IEvent) => {
-        const startMoment = moment(e.startDate);
-        return (
-          startMoment.isValid() &&
-          moment(e.endDate).isValid() &&
-          startMoment.isBetween(
-            moment(day).startOf('day'),
-            moment(day).endOf('day')
-          )
-        );
-      });
+    const convertedEvents = events.map(
+      (e: IEvent) =>
+        ({
+          ...e,
+          startDate: moment(e.startDate).toDate(),
+          endDate: moment(e.endDate).toDate(),
+          columnId: colId,
+          renderer: eventRenderer,
+          onClick: eventOnClick,
+        } as IEvent)
+    );
+
+    // only filter by day if it's not in the week mode
+    return weekMode
+      ? convertedEvents
+      : convertedEvents.filter((e: IEvent) => {
+          const startMoment = moment(e.startDate);
+          return (
+            startMoment.isValid() &&
+            moment(e.endDate).isValid() &&
+            startMoment.isBetween(
+              moment(day).startOf('day'),
+              moment(day).endOf('day')
+            )
+          );
+        });
   };
 
   /**
@@ -179,12 +183,18 @@ const WeekGridDay = (props: IGridDayProps) => {
 
   useEffect(() => {
     if (events.length) {
-      const sartDates: Moment[] = events.map((e: IEvent) =>
-        moment(e.startDate)
+      const startDates: Moment[] = events.map((e: IEvent) =>
+        weekMode
+          ? moment()
+              .hour(moment(e.startDate).hour())
+              .minutes(moment(e.startDate).minutes())
+              .seconds(0)
+          : moment(e.startDate)
       );
+
       // if earliest not found, scroll to 8 am
-      const earliest = sartDates?.length
-        ? moment.min(sartDates)
+      const earliest = startDates?.length
+        ? moment.min(startDates)
         : moment(day).hours(8).minutes(0);
 
       const firstEvent: RefObject<HTMLDivElement> = refMap.get(
@@ -306,12 +316,20 @@ const WeekGridDay = (props: IGridDayProps) => {
             ) : (
               <div className="day-grid" key={`grid-row-${indx}`}>
                 {gridColumns?.map((c: IGridColumn, i: number) => {
+                  const cellHour = c.date ? moment(c.date).hour(h.hour()) : h;
+                  const cellHalfHour = c.date
+                    ? moment(c.date).hour(m.hour()).minute(m.minute())
+                    : m;
+
                   const hourCellRef: RefObject<HTMLDivElement> = createRef();
-                  refMap.set(`${h.format(refDateFormat)}-${c.id}`, hourCellRef);
+                  refMap.set(
+                    `${cellHour.format(refDateFormat)}-${c.id}`,
+                    hourCellRef
+                  );
                   const halfHourCellRef: RefObject<HTMLDivElement> =
                     createRef();
                   refMap.set(
-                    `${m.format(refDateFormat)}-${c.id}`,
+                    `${cellHalfHour.format(refDateFormat)}-${c.id}`,
                     halfHourCellRef
                   );
                   return (
@@ -345,10 +363,16 @@ const WeekGridDay = (props: IGridDayProps) => {
       <div className="day-grid-row">
         <div>
           <div className="day-grid-cell day-grid-gutter">
-            <p className="day-weekday" data-testid="weekday">
-              {moment(day).format('dddd')}
-            </p>
-            <p className="day-date">{moment(day).format('MMMM-DD')}</p>
+            {!weekMode && (
+              <>
+                <p className="day-weekday" data-testid="weekday">
+                  {moment(day).format('dddd')}
+                </p>
+                <p className="day-date" data-testid="cornerDate">
+                  {moment(day).format('MMMM-DD')}
+                </p>
+              </>
+            )}
           </div>
         </div>
         <div

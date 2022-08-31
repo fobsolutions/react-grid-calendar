@@ -13,6 +13,7 @@ export interface CalendarProps {
   dateChanged?: () => void; // callback when the date was changed in the calendar
   locale?: string; // locale code to localize dates
   columns?: Array<IGridColumn>; // grid columns
+  events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
@@ -23,6 +24,7 @@ const Calendar = (props: CalendarProps) => {
     view,
     displayDate,
     columns,
+    events,
     locale = 'en',
     eventRenderer,
     eventOnClick,
@@ -38,8 +40,9 @@ const Calendar = (props: CalendarProps) => {
   return (
     <div>
       <CalendarView
-        displayDate={displayDate || moment()}
+        selectedDate={displayDate || moment()}
         columns={columns}
+        events={events}
         editMode={editMode}
         eventRenderer={eventRenderer}
         eventOnClick={eventOnClick}
