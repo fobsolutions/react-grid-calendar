@@ -1,19 +1,53 @@
+import moment from 'moment';
 import React from 'react';
-import { IViewProps } from './SharedTypes';
+import { nanoid } from 'nanoid';
+import { IEvent, IGridColumn, IViewProps } from './SharedTypes';
 import { getWeekDays } from './util';
-import WeekDay from './WeekDay';
+import WeekGridDay from './WeekGridDay';
 
+/**
+ * A weekly grid view
+ */
 const WeekView = (props: IViewProps) => {
-  const { selectedDate, locale } = props;
+  const {
+    selectedDate,
+    locale,
+    columns,
+    events,
+    eventRenderer,
+    eventOnClick,
+    columnHeaderRenderer,
+    editMode,
+  } = props;
+
   const weekDays = getWeekDays(selectedDate);
-  console.log(locale);
-  console.log(weekDays);
+
   return (
-    <div>
-      {weekDays.map(weekDay => (
-        <WeekDay day={weekDay.toDate()} />
-      ))}
-    </div>
+    <WeekGridDay
+      day={selectedDate}
+      columns={
+        columns ||
+        weekDays.map((weekDay) => {
+          return {
+            id: nanoid(6),
+            date: weekDay.toDate(),
+            label: weekDay.format('dddd'),
+            events: events?.filter((evt: IEvent) => {
+              return moment(evt.startDate).isBetween(
+                weekDay.startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+                weekDay.endOf('day').format('YYYY-MM-DD HH:mm:ss')
+              );
+            }),
+          } as IGridColumn;
+        })
+      }
+      locale={locale}
+      editMode={editMode}
+      eventRenderer={eventRenderer}
+      eventOnClick={eventOnClick}
+      columnHeaderRenderer={columnHeaderRenderer}
+      weekMode={true}
+    />
   );
 };
 

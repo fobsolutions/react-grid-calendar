@@ -1,0 +1,114 @@
+.day-wrapper {
+    padding-bottom: 10px;
+}
+.day-grid {
+    display: flex;
+}
+.day-grid-row {
+    display: flex;
+}
+.day-container {
+    max-height: 450px;
+}
+.scroll-panel {
+    overflow: auto;
+    overflow: overlay;
+}
+.scroll-panel:active::-webkit-scrollbar-thumb,
+.scroll-panel:focus::-webkit-scrollbar-thumb,
+.scroll-panel:hover::-webkit-scrollbar-thumb{
+    visibility: visible;
+}
+.scroll-panel::-webkit-scrollbar-thumb {
+    visibility: hidden;
+    border: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: #dadce0;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+.scroll-panel::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.grid-container-events {
+    position: relative;
+}
+.day-weekday {
+    margin: 0px 0px 5px 0px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+.day-date {
+    margin: 0px;
+    text-transform: capitalize;
+}
+.grid-header-cols {
+    display: flex;
+    flex: 1;
+}
+.day-grid-cols {
+    flex: 1;
+    position: relative;
+}
+.day-grid-col {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 150px;
+}
+.day-grid-cell {
+    border-right: 1px solid #dadce0;
+    border-bottom: 1px solid #dadce0;
+    height: 70px;
+}
+.day-grid-half-hour {
+    height:50%;
+    width:100%;
+}
+.day-grid-gutter {
+    width: 100px;
+}
+.day-grid-gutter > div {
+    padding-left: 5px;
+}
+.day-grid-gutter > div:first-child {
+    height:50%;
+    border-bottom: 1px solid #e8ebef;
+}
+.day-grid-hour {
+    min-height: 70px;
+}
+.grid-events-wrapper {
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+.grid-events {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    pointer-events: none;
+}
+.calendar-event {
+    z-index: 1;
+    pointer-events: all;
+}
+.calendar-event-body {
+    padding: 5px;
+}
+.collapsed {
+    height: 3px;
+    display: flex;
+    align-items: center;
+}
+.collapsed > div {
+    border-top: 3px solid #8999A8;
+    width: 100%;
+    position: absolute;
+}

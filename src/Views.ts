@@ -1,29 +1,17 @@
 import MonthView from './MonthView';
+import WeekGridView from './WeekGridView';
 import WeekView from './WeekView';
-import { lowerCase, values, reverse } from 'lodash';
 
 export enum EViewType {
   month = 'month',
   week = 'week',
+  weekgrid = 'weekgrid',
 }
 
 const Views: { [key in EViewType]: React.ElementType } = {
   month: MonthView,
   week: WeekView,
-};
-
-/**
- * Converts the views passed in props to enums, if the array is empty returns all available views
- * @param views
- */
-export const getViews = (views: Array<string>): Array<EViewType> => {
-  return views.length
-    ? views
-        .filter((viewStr: string) => lowerCase(viewStr) in EViewType)
-        .map((viewStr: string) => {
-          return lowerCase(viewStr) as EViewType;
-        })
-    : reverse(values(EViewType));
+  weekgrid: WeekGridView,
 };
 
 /**
@@ -32,8 +20,8 @@ export const getViews = (views: Array<string>): Array<EViewType> => {
  * @returns EViewType with the selected view
  */
 export const getViewFromString = (viewStr: string) => {
-  return lowerCase(viewStr) in EViewType
-    ? (lowerCase(viewStr) as EViewType)
+  return viewStr.toLowerCase() in EViewType
+    ? (viewStr.toLowerCase() as EViewType)
     : EViewType.week;
 };
 
