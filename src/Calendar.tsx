@@ -17,6 +17,7 @@ export interface CalendarProps {
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  gutterClassName?: string;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -30,6 +31,7 @@ const Calendar = (props: CalendarProps) => {
     eventOnClick,
     columnHeaderRenderer,
     editMode,
+    gutterClassName,
   } = props;
 
   // this sets the moment.js locale for entire package
@@ -47,6 +49,7 @@ const Calendar = (props: CalendarProps) => {
         eventRenderer={eventRenderer}
         eventOnClick={eventOnClick}
         columnHeaderRenderer={columnHeaderRenderer}
+        gutterClassName={gutterClassName}
       />
     </div>
   );

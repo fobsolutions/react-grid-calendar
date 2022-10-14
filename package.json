@@ -1,5 +1,5 @@
 {
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -34,7 +34,7 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "react-grid-calendar",
+  "name": "@fob-solutions/react-grid-calendar",
   "author": "Dmitry Fadeev (FOB solutions)",
   "module": "dist/react-grid-calendar.esm.js",
   "size-limit": [

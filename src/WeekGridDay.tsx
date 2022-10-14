@@ -31,6 +31,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     editMode,
     columnHeaderRenderer,
     weekMode,
+    gutterClassName,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -362,7 +363,9 @@ const WeekGridDay = (props: IGridDayProps) => {
     <div className="day-wrapper">
       <div className="day-grid-row">
         <div>
-          <div className="day-grid-cell day-grid-gutter">
+          <div
+            className={`${gutterClassName || ''} day-grid-cell day-grid-gutter`}
+          >
             {!weekMode && (
               <>
                 <p className="day-weekday" data-testid="weekday">
