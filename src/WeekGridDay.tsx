@@ -28,6 +28,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     columns,
     eventRenderer,
     eventOnClick,
+    cellOnClick,
     editMode,
     columnHeaderRenderer,
     weekMode,
@@ -341,11 +342,27 @@ const WeekGridDay = (props: IGridDayProps) => {
                         className="day-grid-half-hour"
                         key={`column-hour-${i}`}
                         ref={hourCellRef}
+                        onClick={() => {
+                          if (cellOnClick) {
+                            cellOnClick(
+                              c.id || '',
+                              cellHour.format(refDateFormat)
+                            );
+                          }
+                        }}
                       ></div>
                       <div
                         className="day-grid-half-hour"
                         key={`column-half-hour-${i}`}
                         ref={halfHourCellRef}
+                        onClick={() => {
+                          if (cellOnClick) {
+                            cellOnClick(
+                              c.id || '',
+                              cellHalfHour.format(refDateFormat)
+                            );
+                          }
+                        }}
                       ></div>
                     </div>
                   );

@@ -16,6 +16,7 @@ export interface CalendarProps {
   events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
+  cellOnClick?: (columnId: string, date: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
 }
 
@@ -28,6 +29,7 @@ const Calendar = (props: CalendarProps) => {
     locale = 'en',
     eventRenderer,
     eventOnClick,
+    cellOnClick,
     columnHeaderRenderer,
     editMode,
   } = props;
@@ -46,6 +48,7 @@ const Calendar = (props: CalendarProps) => {
         editMode={editMode}
         eventRenderer={eventRenderer}
         eventOnClick={eventOnClick}
+        cellOnClick={cellOnClick}
         columnHeaderRenderer={columnHeaderRenderer}
       />
     </div>
