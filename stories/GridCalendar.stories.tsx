@@ -36,6 +36,9 @@ WeekGridView.args = {
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
   },
+  cellOnClick: (columnId: string, date: string) => {
+    console.log('col:' + columnId + ' date:' + date);
+  },
   eventRenderer: (event: IEvent) => {
     return (
       <div
@@ -69,6 +72,9 @@ WeekView.args = {
   locale: 'en',
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
+  },
+  cellOnClick: (columnId: string, date: string) => {
+    console.log('col:' + columnId + ' date:' + date);
   },
   eventRenderer: (event: IEvent) => {
     return (

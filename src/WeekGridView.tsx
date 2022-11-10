@@ -13,6 +13,7 @@ const WeekGridView = (props: IViewProps) => {
     columns,
     eventRenderer,
     eventOnClick,
+    cellOnClick,
     columnHeaderRenderer,
     editMode,
   } = props;
@@ -28,6 +29,7 @@ const WeekGridView = (props: IViewProps) => {
           editMode={editMode}
           eventRenderer={eventRenderer}
           eventOnClick={eventOnClick}
+          cellOnClick={cellOnClick}
           columnHeaderRenderer={columnHeaderRenderer}
         />
       ))}
