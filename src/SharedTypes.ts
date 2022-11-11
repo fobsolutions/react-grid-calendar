@@ -10,6 +10,7 @@ export interface IViewProps {
   cellOnClick?: (columnId: string, date: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
+  gutterClassName?: string;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -23,6 +24,7 @@ export interface IGridDayProps {
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
   weekMode?: boolean;
+  gutterClassName?: string;
 }
 
 export interface IEvent {
