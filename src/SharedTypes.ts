@@ -7,7 +7,7 @@ export interface IViewProps {
   events?: Array<IEvent>;
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
-  cellOnClick?: (columnId: string, date: string) => void;
+  cellOnClick?: (columnData: unknown, date: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
   gutterClassName?: string;
@@ -20,7 +20,7 @@ export interface IGridDayProps {
   locale: string;
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
-  cellOnClick?: (columnId: string, date: string) => void;
+  cellOnClick?: (columnData: unknown, date: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
   weekMode?: boolean;
@@ -46,6 +46,7 @@ export interface IEvent {
 export interface IGridColumn {
   label: string;
   events: Array<IEvent>;
+  columnData?: unknown; // any object to be associated with the column
   id?: string;
   date?: Date;
 }
