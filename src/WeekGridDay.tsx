@@ -252,7 +252,9 @@ const WeekGridDay = (props: IGridDayProps) => {
         <div key={`hour-row-${i}`} className="day-grid-row">
           <div
             key={`hour-cell-${i}`}
-            className="day-grid-cell day-grid-gutter day-grid-hour"
+            className={`${
+              gutterClassName || ''
+            } day-grid-cell day-grid-gutter day-grid-hour`}
           >
             <div ref={hourRef}>{h.format('H:mm')}</div>
             <div ref={halfHourRef}>{m.format('H:mm')}</div>
