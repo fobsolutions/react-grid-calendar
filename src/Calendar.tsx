@@ -16,7 +16,7 @@ export interface CalendarProps {
   events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
-  cellOnClick?: (columnId: string, date: string) => void;
+  cellOnClick?: (columnData: unknown, date: string) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   gutterClassName?: string;
 }
@@ -59,3 +59,4 @@ const Calendar = (props: CalendarProps) => {
 };
 
 export default Calendar;
+export { IGridColumn, IEvent } from './SharedTypes';
