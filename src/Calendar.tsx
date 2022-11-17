@@ -16,7 +16,7 @@ export interface CalendarProps {
   events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
-  cellOnClick?: (columnId: string, date: string) => void;
+  cellOnClick?: (columnId: string, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   gutterClassName?: string;
 }
