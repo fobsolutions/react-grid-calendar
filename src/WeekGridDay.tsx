@@ -347,7 +347,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                         ref={hourCellRef}
                         onClick={() => {
                           if (cellOnClick) {
-                            cellOnClick(c.id || '', cellHour.toDate());
+                            cellOnClick(c.columnData, cellHour.toDate());
                           }
                         }}
                       ></div>
@@ -357,7 +357,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                         ref={halfHourCellRef}
                         onClick={() => {
                           if (cellOnClick) {
-                            cellOnClick(c.id || '', cellHalfHour.toDate());
+                            cellOnClick(c.columnData, cellHalfHour.toDate());
                           }
                         }}
                       ></div>
