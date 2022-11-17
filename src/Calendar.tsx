@@ -59,3 +59,4 @@ const Calendar = (props: CalendarProps) => {
 };
 
 export default Calendar;
+export { IGridColumn, IEvent } from './SharedTypes';

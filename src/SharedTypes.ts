@@ -46,6 +46,7 @@ export interface IEvent {
 export interface IGridColumn {
   label: string;
   events: Array<IEvent>;
+  columnData?: unknown; // any object to be associated with the column
   id?: string;
   date?: Date;
 }

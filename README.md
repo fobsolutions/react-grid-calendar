@@ -84,6 +84,7 @@ const columns = [
             backgroundColor: `#0000ff`,
         }
     ],
+    columnData: { id: '000-000-001', name: 'Court 1' }
   }
 ];
 
@@ -156,6 +157,19 @@ You can listen to event clicks by specifying the **eventOnClick** paramter to th
 <GridCalendar
     columns={columns}
     eventOnClick={(event) => console.log('clicked event: + event.eventId')}
+/>
+```
+
+## Listening to cell clicks
+
+You can listen to clicks on empty cells by specifying the **cellOnClick** paramter to the component. This function accepts two parameters **columnData** [unknown] and **date** [string]. **columnData** contains the data provided in the **columnData** property specified in the column (see _Week Grid view_ section above) and **date** contains the date associated with the lcicked cell.
+
+```
+<GridCalendar
+    columns={columns}
+    cellOnClick: (columnData: unknown, date: string) => {
+        console.log('col:' + JSON.stringify(columnData) + ' date:' + date);
+    }
 />
 ```
 

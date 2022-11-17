@@ -16,6 +16,7 @@ const WeekView = (props: IViewProps) => {
     events,
     eventRenderer,
     eventOnClick,
+    cellOnClick,
     columnHeaderRenderer,
     editMode,
   } = props;
@@ -45,6 +46,7 @@ const WeekView = (props: IViewProps) => {
       editMode={editMode}
       eventRenderer={eventRenderer}
       eventOnClick={eventOnClick}
+      cellOnClick={cellOnClick}
       columnHeaderRenderer={columnHeaderRenderer}
       weekMode={true}
     />
