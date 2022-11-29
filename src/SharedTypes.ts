@@ -31,16 +31,16 @@ export interface IEvent {
   eventId: string;
   startDate: Date;
   endDate: Date;
-  backgroundColor: string;
-  label: string;
-  body: string;
-  color: string;
-  labelClass: string;
-  columnId: string;
-  rect: IEventRect;
-  renderer: (event: IEvent) => ReactElement;
-  onClick: (eventId: string) => void;
-  duration: number; // duration in minutes
+  backgroundColor?: string;
+  label?: string;
+  body?: string;
+  color?: string;
+  labelClass?: string;
+  columnId?: string;
+  rect?: IEventRect;
+  renderer?: (event: IEvent) => ReactElement;
+  onClick?: (eventId: string) => void;
+  duration?: number; // duration in minutes
 }
 
 export interface IGridColumn {

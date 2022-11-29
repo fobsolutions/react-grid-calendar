@@ -285,10 +285,10 @@ const WeekGridDay = (props: IGridDayProps) => {
                     style={{
                       backgroundColor: e.backgroundColor || 'transparent',
                       position: 'absolute',
-                      top: `${e.rect.top}px`,
-                      left: `${e.rect.left}px`,
-                      width: `calc(${e.rect.width}px - 20px)`,
-                      height: `${e.rect.height}px`,
+                      top: `${e.rect?.top}px`,
+                      left: `${e.rect?.left}px`,
+                      width: `calc(${e.rect?.width}px - 20px)`,
+                      height: `${e.rect?.height}px`,
                     }}
                   >
                     {e.renderer ? (
