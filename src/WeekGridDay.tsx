@@ -127,7 +127,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   useEffect(() => {
-    if (columns?.length && !gridColumns?.length) {
+    if (columns?.length) {
       // process columns
       const cols: IGridColumn[] =
         columns?.map((col) => {
@@ -141,7 +141,7 @@ const WeekGridDay = (props: IGridDayProps) => {
 
       setGridColumns(cols);
     }
-  }, []);
+  }, [columns]);
 
   useEffect(() => {
     const gaps: ITimeGap[] = [];
