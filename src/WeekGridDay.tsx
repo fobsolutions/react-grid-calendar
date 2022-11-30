@@ -33,6 +33,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     columnHeaderRenderer,
     weekMode,
     gutterClassName,
+    scrollToEarliest = true,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -184,7 +185,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, [gaps]);
 
   useEffect(() => {
-    if (events.length) {
+    if (events.length && scrollToEarliest) {
       const startDates: Moment[] = events.map((e: IEvent) =>
         weekMode
           ? moment()
@@ -193,6 +194,11 @@ const WeekGridDay = (props: IGridDayProps) => {
               .seconds(0)
           : moment(e.startDate)
       );
+
+      // scroll to the very top to reset the scrolling
+      gridWrapper?.current?.scrollTo({
+        top: 0,
+      });
 
       // if earliest not found, scroll to 8 am
       const earliest = startDates?.length

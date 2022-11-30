@@ -11,6 +11,7 @@ export interface IViewProps {
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
   gutterClassName?: string;
+  scrollToEarliest?: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -25,6 +26,7 @@ export interface IGridDayProps {
   editMode?: boolean;
   weekMode?: boolean;
   gutterClassName?: string;
+  scrollToEarliest?: boolean;
 }
 
 export interface IEvent {
