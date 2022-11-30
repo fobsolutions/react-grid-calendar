@@ -33,6 +33,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     columnHeaderRenderer,
     weekMode,
     gutterClassName,
+    scrollToEarliest = true,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -127,7 +128,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   useEffect(() => {
-    if (columns?.length && !gridColumns?.length) {
+    if (columns?.length) {
       // process columns
       const cols: IGridColumn[] =
         columns?.map((col) => {
@@ -141,7 +142,7 @@ const WeekGridDay = (props: IGridDayProps) => {
 
       setGridColumns(cols);
     }
-  }, []);
+  }, [columns]);
 
   useEffect(() => {
     const gaps: ITimeGap[] = [];
@@ -184,7 +185,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, [gaps]);
 
   useEffect(() => {
-    if (events.length) {
+    if (events.length && scrollToEarliest) {
       const startDates: Moment[] = events.map((e: IEvent) =>
         weekMode
           ? moment()
@@ -193,6 +194,11 @@ const WeekGridDay = (props: IGridDayProps) => {
               .seconds(0)
           : moment(e.startDate)
       );
+
+      // scroll to the very top to reset the scrolling
+      gridWrapper?.current?.scrollTo({
+        top: 0,
+      });
 
       // if earliest not found, scroll to 8 am
       const earliest = startDates?.length
@@ -285,10 +291,10 @@ const WeekGridDay = (props: IGridDayProps) => {
                     style={{
                       backgroundColor: e.backgroundColor || 'transparent',
                       position: 'absolute',
-                      top: `${e.rect.top}px`,
-                      left: `${e.rect.left}px`,
-                      width: `calc(${e.rect.width}px - 20px)`,
-                      height: `${e.rect.height}px`,
+                      top: `${e.rect?.top}px`,
+                      left: `${e.rect?.left}px`,
+                      width: `calc(${e.rect?.width}px - 20px)`,
+                      height: `${e.rect?.height}px`,
                     }}
                   >
                     {e.renderer ? (

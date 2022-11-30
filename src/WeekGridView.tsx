@@ -17,6 +17,7 @@ const WeekGridView = (props: IViewProps) => {
     columnHeaderRenderer,
     editMode,
     gutterClassName,
+    scrollToEarliest,
   } = props;
   const weekDays = getWeekDays(selectedDate);
   return (
@@ -33,6 +34,7 @@ const WeekGridView = (props: IViewProps) => {
           cellOnClick={cellOnClick}
           columnHeaderRenderer={columnHeaderRenderer}
           gutterClassName={gutterClassName}
+          scrollToEarliest={scrollToEarliest}
         />
       ))}
     </div>
