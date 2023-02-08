@@ -113,3 +113,12 @@
   width: 100%;
   position: absolute;
 }
+.cell-disabled {
+  background-color: #ebebeb;
+}
+.week-view {
+  /* On screens that are 768px or less, hide the week view*/
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+}
