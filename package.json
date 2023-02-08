@@ -1,5 +1,5 @@
 {
-  "version": "0.1.24",
+  "version": "0.1.31",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -79,6 +79,7 @@
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
     "rollup-plugin-postcss": "^4.0.2",
+    "sass": "^1.58.0",
     "size-limit": "^7.0.8",
     "ts-jest": "^28.0.7",
     "tsdx": "^0.13.3",

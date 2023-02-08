@@ -49,6 +49,7 @@ const WeekView = (props: IViewProps) => {
       cellOnClick={cellOnClick}
       columnHeaderRenderer={columnHeaderRenderer}
       weekMode={true}
+      classNames={'week-view'}
     />
   );
 };

@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { ReactElement } from 'react';
 import { IEvent, IGridColumn } from './SharedTypes';
 import Views, { getViewFromString } from './Views';
-import './Main.css';
+import './Main.scss';
 
 export interface CalendarProps {
   view: string;

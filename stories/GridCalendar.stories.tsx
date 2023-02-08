@@ -5,6 +5,7 @@ import { columnsMock } from '../mocks/Columns';
 import { IEvent, IGridColumn } from '../src/SharedTypes';
 import moment from 'moment';
 import { generateRandomEvents } from '../src/util';
+import { floor } from 'lodash';
 
 const meta: Meta = {
   title: 'Grid calendar',
@@ -31,6 +32,7 @@ export const WeekGridView = Template.bind({});
 
 WeekGridView.args = {
   view: 'weekgrid',
+  editMode: true,
   columns: columnsMock,
   locale: 'en',
   eventOnClick: (eventId: string) => {
@@ -42,7 +44,12 @@ WeekGridView.args = {
   eventRenderer: (event: IEvent) => {
     return (
       <div
-        style={{ height: '100%', backgroundColor: '#e4e4e4', display: 'flex' }}
+        style={{
+          height: '100%',
+          backgroundColor: '#e4e4e4',
+          display: 'flex',
+          boxShadow: 'inset 0 0 0 1px #fff',
+        }}
       >
         <div
           style={{

@@ -27,6 +27,7 @@ export interface IGridDayProps {
   weekMode?: boolean;
   gutterClassName?: string;
   scrollToEarliest?: boolean;
+  classNames?: string;
 }
 
 export interface IEvent {
@@ -41,8 +42,9 @@ export interface IEvent {
   columnId?: string;
   rect?: IEventRect;
   renderer?: (event: IEvent) => ReactElement;
-  onClick?: (eventId: string) => void;
+  onClick?: (eventId: IEvent) => void;
   duration?: number; // duration in minutes
+  overlapingEvents?: number; // how many evetnts are overlapping
 }
 
 export interface IGridColumn {
@@ -51,6 +53,13 @@ export interface IGridColumn {
   columnData?: unknown; // any object to be associated with the column
   id?: string;
   date?: Date;
+  availability?: Array<IAvailabilityTime>;
+}
+
+export interface IAvailabilityTime {
+  weekDay: number;
+  startTime: string;
+  endTime: string;
 }
 
 export interface IEventRect {
@@ -58,6 +67,7 @@ export interface IEventRect {
   left: number;
   width: number;
   height: number;
+  zIndex: number;
 }
 
 export interface ITimeGap {
