@@ -1,7 +1,9 @@
+import { random, times } from 'lodash';
 import moment from 'moment';
 import { IGridColumn } from '../src/SharedTypes';
 import {
   generateRandomEvents,
+  generateRandomEventsSameDate,
   generateRandomEventsSameTime,
 } from '../src/util';
 
@@ -92,3 +94,14 @@ export const columnsMock: Array<IGridColumn> = [
     columnData: null,
   },
 ];
+
+export const weekEvents = () => {
+  const monday = moment().startOf('isoWeek');
+  return times(7, (indx) => {
+    const d = monday.clone().add(indx, 'days');
+    return {
+      date: d.format('yyyy-MM-DD'),
+      events: generateRandomEventsSameDate(d.toDate(), random(1, 5)),
+    };
+  });
+};

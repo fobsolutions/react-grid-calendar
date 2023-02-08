@@ -1,11 +1,10 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { GridCalendar } from '../src';
-import { columnsMock } from '../mocks/Columns';
+import { columnsMock, weekEvents } from '../mocks/Columns';
 import { IEvent, IGridColumn } from '../src/SharedTypes';
 import moment from 'moment';
 import { generateRandomEvents } from '../src/util';
-import { floor } from 'lodash';
 
 const meta: Meta = {
   title: 'Grid calendar',
@@ -75,7 +74,7 @@ export const WeekView = Template.bind({});
 
 WeekView.args = {
   view: 'week',
-  events: generateRandomEvents(8),
+  events: weekEvents(),
   locale: 'en',
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
@@ -87,6 +86,31 @@ WeekView.args = {
     return (
       <div
         style={{ height: '100%', backgroundColor: '#e4e4e4', display: 'flex' }}
+      >
+        <div
+          style={{
+            backgroundColor: event.backgroundColor,
+            width: '5px',
+          }}
+        ></div>
+        <div style={{ padding: '5px' }}>
+          <span>
+            Start: {moment(event.startDate).format('DD-MM HH:mm')} End:
+            {moment(event.endDate).format('HH:mm')}
+          </span>
+        </div>
+      </div>
+    );
+  },
+  mobileEventRenderer: (event: IEvent) => {
+    return (
+      <div
+        style={{
+          height: '100%',
+          backgroundColor: '#e4e4e4',
+          display: 'flex',
+          margin: '5px 0px',
+        }}
       >
         <div
           style={{

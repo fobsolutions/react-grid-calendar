@@ -115,7 +115,7 @@ const WeekGridDay = (props: IGridDayProps) => {
    * @returns
    */
   const convertEvents = (events: IEvent[], colId: string) => {
-    const convertedEvents = events.map(
+    const convertedEvents = events?.map(
       (e: IEvent) =>
         ({
           ...e,

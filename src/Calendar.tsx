@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { ReactElement } from 'react';
 import { IEvent, IGridColumn } from './SharedTypes';
 import Views, { getViewFromString } from './Views';
-import './Main.scss';
+import './Main.css';
 
 export interface CalendarProps {
   view: string;
@@ -15,6 +15,7 @@ export interface CalendarProps {
   columns?: Array<IGridColumn>; // grid columns
   events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
+  mobileEventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
@@ -30,6 +31,7 @@ const Calendar = (props: CalendarProps) => {
     events,
     locale = 'en',
     eventRenderer,
+    mobileEventRenderer,
     eventOnClick,
     cellOnClick,
     columnHeaderRenderer,
@@ -51,6 +53,7 @@ const Calendar = (props: CalendarProps) => {
         events={events}
         editMode={editMode}
         eventRenderer={eventRenderer}
+        mobileEventRenderer={mobileEventRenderer}
         eventOnClick={eventOnClick}
         cellOnClick={cellOnClick}
         columnHeaderRenderer={columnHeaderRenderer}

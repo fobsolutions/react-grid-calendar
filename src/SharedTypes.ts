@@ -4,8 +4,9 @@ export interface IViewProps {
   selectedDate: Date;
   locale: string;
   columns?: Array<IGridColumn>;
-  events?: Array<IEvent>;
+  events?: Array<IDayEvents>;
   eventRenderer?: (event: IEvent) => ReactElement;
+  mobileEventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
@@ -73,4 +74,9 @@ export interface IEventRect {
 export interface ITimeGap {
   from: Date;
   to: Date;
+}
+
+export interface IDayEvents {
+  date: string;
+  events: Array<IEvent>;
 }

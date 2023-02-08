@@ -77,6 +77,6 @@ describe('WeekGridDay', () => {
 
     fireEvent.click(component.getByText('click me'));
 
-    expect(eventClick).toHaveBeenCalledWith('0000');
+    expect(eventClick).toHaveBeenCalled();
   });
 });

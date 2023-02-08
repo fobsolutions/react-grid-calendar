@@ -8,6 +8,7 @@ import { columnsMock } from '../mocks/Columns';
 describe('WeekView', () => {
   afterEach(cleanup);
   it('renders without crashing with columns', () => {
+    Element.prototype.scrollTo = () => {};
     render(
       <WeekView
         selectedDate={moment().toDate()}
@@ -24,7 +25,7 @@ describe('WeekView', () => {
         selectedDate={moment().toDate()}
         locale="en"
         editMode={false}
-        events={columnsMock[0].events}
+        events={[{ date: '2023-02-08', events: columnsMock[0].events }]}
       />
     );
   });
