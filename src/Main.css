@@ -113,3 +113,34 @@
   width: 100%;
   position: absolute;
 }
+.cell-disabled {
+  background-color: #ebebeb;
+}
+
+.week-sm-view {
+  display: none;
+}
+
+.mobile-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.mobile-header-divider {
+  flex-grow: 1;
+}
+
+.mobile-header-title {
+  padding: 0px 10px;
+}
+
+/* On screens that are 768px or less, hide the week view*/
+@media screen and (max-width: 768px) {
+  .week-view {
+    display: none;
+  }
+
+  .week-sm-view {
+    display: block;
+  }
+}

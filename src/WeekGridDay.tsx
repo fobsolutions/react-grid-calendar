@@ -6,7 +6,17 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { times, flatten, head, last, range, sortBy } from 'lodash';
+import {
+  times,
+  flatten,
+  head,
+  last,
+  range,
+  sortBy,
+  some,
+  filter,
+  findIndex,
+} from 'lodash';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
 
@@ -16,6 +26,7 @@ import {
   IEventRect,
   IEvent,
   ITimeGap,
+  IAvailabilityTime,
 } from './SharedTypes';
 import { checkForEvents, isCollapsed } from './util';
 
@@ -33,6 +44,8 @@ const WeekGridDay = (props: IGridDayProps) => {
     columnHeaderRenderer,
     weekMode,
     gutterClassName,
+    classNames,
+    scrollToEarliest = true,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -46,22 +59,52 @@ const WeekGridDay = (props: IGridDayProps) => {
 
   /**
    * Gets the position of the element in the grid inside of the absolute container
-   * @param element to find the position for
+   * @param startElement
+   * @param endElement
+   * @param overlappingEvents - an array of overlapping events
+   * @param eventId - id of the currently processed event
    * @returns IPosition the position of the element
    */
   const getElementRect = (
-    startElement: HTMLElement | null,
-    endElement?: HTMLElement | null
+    startElement: HTMLElement,
+    overlappingEvents: Array<IEvent>,
+    endElement: HTMLElement,
+    event: IEvent
   ): IEventRect => {
+    const shiftStep = startElement?.clientWidth / 5;
+    let eventPosition = 0;
+
+    // sort events by id and find current event's position in that array
+    if (overlappingEvents.length) {
+      const sortingArray = [...overlappingEvents, event].map((ev: IEvent) => {
+        return {
+          ...ev,
+          duration: moment(ev.startDate).diff(moment(ev.endDate), 'seconds'),
+        };
+      });
+
+      eventPosition = findIndex(
+        sortBy(sortingArray, ['startDate', 'duration', 'eventId']),
+        {
+          eventId: event.eventId,
+        }
+      );
+    }
+
     return {
       top: startElement?.offsetTop,
-      left: startElement?.offsetLeft,
-      width: startElement?.clientWidth,
+      left:
+        startElement?.offsetLeft +
+        (overlappingEvents.length > 0 ? shiftStep * eventPosition : 0),
+      width:
+        startElement?.clientWidth -
+        (overlappingEvents.length > 0 ? shiftStep * eventPosition : 0),
       height: endElement
         ? endElement?.offsetTop +
           endElement?.clientHeight -
           (startElement?.offsetTop || 0)
         : startElement?.clientHeight,
+      zIndex: eventPosition,
     } as IEventRect;
   };
 
@@ -72,7 +115,7 @@ const WeekGridDay = (props: IGridDayProps) => {
    * @returns
    */
   const convertEvents = (events: IEvent[], colId: string) => {
-    const convertedEvents = events.map(
+    const convertedEvents = events?.map(
       (e: IEvent) =>
         ({
           ...e,
@@ -116,18 +159,33 @@ const WeekGridDay = (props: IGridDayProps) => {
           .format(refDateFormat)}-${e.columnId}`
       );
 
+      // get the overlapping events
+      const overlappingEvents: Array<IEvent> = [];
+      eventList.forEach((oEvent: IEvent) => {
+        if (
+          oEvent.eventId !== e.eventId &&
+          moment(oEvent.startDate).isBefore(moment(e.endDate)) &&
+          moment(e.startDate).isBefore(moment(oEvent.endDate)) &&
+          oEvent.columnId === e.columnId
+        ) {
+          overlappingEvents.push(oEvent);
+        }
+      });
+
       return {
         ...e,
         rect: getElementRect(
           gridElement?.current as HTMLElement,
-          endGridElement?.current as HTMLElement
+          overlappingEvents,
+          endGridElement?.current as HTMLElement,
+          e
         ),
       } as IEvent;
     });
   };
 
   useEffect(() => {
-    if (columns?.length && !gridColumns?.length) {
+    if (columns?.length) {
       // process columns
       const cols: IGridColumn[] =
         columns?.map((col) => {
@@ -141,7 +199,7 @@ const WeekGridDay = (props: IGridDayProps) => {
 
       setGridColumns(cols);
     }
-  }, []);
+  }, [columns]);
 
   useEffect(() => {
     const gaps: ITimeGap[] = [];
@@ -184,7 +242,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, [gaps]);
 
   useEffect(() => {
-    if (events.length) {
+    if (events.length && scrollToEarliest) {
       const startDates: Moment[] = events.map((e: IEvent) =>
         weekMode
           ? moment()
@@ -193,6 +251,11 @@ const WeekGridDay = (props: IGridDayProps) => {
               .seconds(0)
           : moment(e.startDate)
       );
+
+      // scroll to the very top to reset the scrolling
+      gridWrapper?.current?.scrollTo({
+        top: 0,
+      });
 
       // if earliest not found, scroll to 8 am
       const earliest = startDates?.length
@@ -277,7 +340,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                 {events.map((e: IEvent, i: number) => (
                   <div
                     onClick={() => {
-                      e.onClick ? e.onClick(e.eventId) : null;
+                      e.onClick ? e.onClick(e) : null;
                     }}
                     role="button"
                     key={`event-${i}`}
@@ -285,10 +348,11 @@ const WeekGridDay = (props: IGridDayProps) => {
                     style={{
                       backgroundColor: e.backgroundColor || 'transparent',
                       position: 'absolute',
-                      top: `${e.rect.top}px`,
-                      left: `${e.rect.left}px`,
-                      width: `calc(${e.rect.width}px - 20px)`,
-                      height: `${e.rect.height}px`,
+                      top: `${e.rect?.top}px`,
+                      left: `${e.rect?.left}px`,
+                      width: `calc(${e.rect?.width}px - 15px)`,
+                      height: `${e.rect?.height}px`,
+                      zIndex: `${e.rect?.zIndex}`,
                     }}
                   >
                     {e.renderer ? (
@@ -336,27 +400,87 @@ const WeekGridDay = (props: IGridDayProps) => {
                     `${cellHalfHour.format(refDateFormat)}-${c.id}`,
                     halfHourCellRef
                   );
+                  let isHourClickable = true;
+                  let isHalfHourClickable = true;
+
+                  if (c.availability) {
+                    isHourClickable = true;
+                    isHalfHourClickable = true;
+
+                    // see if the HOUR cell in the availabilty
+                    if (
+                      !some(
+                        filter(c.availability, {
+                          weekDay: moment(day).isoWeekday(),
+                        }),
+                        (availability: IAvailabilityTime) => {
+                          const cellMoment = moment(
+                            cellHour.format('HH:mm'),
+                            'HH:mm'
+                          );
+                          return (
+                            cellMoment.isSameOrAfter(
+                              moment(availability.startTime, 'HH:mm')
+                            ) &&
+                            cellMoment.isBefore(
+                              moment(availability.endTime, 'HH:mm')
+                            )
+                          );
+                        }
+                      )
+                    ) {
+                      isHourClickable = false;
+                    }
+                    // see if the HALF-HOUR cell in the availabilty
+                    if (
+                      !some(
+                        filter(c.availability, {
+                          weekDay: moment(day).isoWeekday(),
+                        }),
+                        (availability: IAvailabilityTime) => {
+                          const cellMoment = moment(
+                            cellHalfHour.format('HH:mm'),
+                            'HH:mm'
+                          );
+                          return (
+                            cellMoment.isSameOrAfter(
+                              moment(availability.startTime, 'HH:mm')
+                            ) &&
+                            cellMoment.isBefore(
+                              moment(availability.endTime, 'HH:mm')
+                            )
+                          );
+                        }
+                      )
+                    ) {
+                      isHalfHourClickable = false;
+                    }
+                  }
                   return (
                     <div
                       className="day-grid-cell day-grid-col"
                       key={`column-${i}`}
                     >
                       <div
-                        className="day-grid-half-hour"
+                        className={`day-grid-half-hour ${
+                          !isHourClickable ? 'cell-disabled' : ''
+                        }`}
                         key={`column-hour-${i}`}
                         ref={hourCellRef}
                         onClick={() => {
-                          if (cellOnClick) {
+                          if (cellOnClick && isHourClickable) {
                             cellOnClick(c.columnData, cellHour.toDate());
                           }
                         }}
                       ></div>
                       <div
-                        className="day-grid-half-hour"
+                        className={`day-grid-half-hour ${
+                          !isHalfHourClickable ? 'cell-disabled' : ''
+                        }`}
                         key={`column-half-hour-${i}`}
                         ref={halfHourCellRef}
                         onClick={() => {
-                          if (cellOnClick) {
+                          if (cellOnClick && isHalfHourClickable) {
                             cellOnClick(c.columnData, cellHalfHour.toDate());
                           }
                         }}
@@ -373,7 +497,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   return (
-    <div className="day-wrapper">
+    <div className={`day-wrapper ${classNames}`}>
       <div className="day-grid-row">
         <div>
           <div

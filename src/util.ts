@@ -21,8 +21,41 @@ export const getWeekDays = (
 export const generateRandomEvents = (count?: number) => {
   const weekDays = getWeekDays(moment().toDate());
   return times(count || random(0, 8), () => {
-    const startDate = moment(sample(weekDays)).hours(random(8, 18)).minutes(0);
+    const startDate = moment(sample(weekDays)).hours(random(8, 9)).minutes(0);
     const endDate = moment(startDate).add(random(1, 6) * 30, 'minutes');
+
+    return {
+      eventId: `${random(999, 9999)}-${random(999, 9999)}-${random(999, 9999)}`,
+      startDate: startDate.toDate(),
+      endDate: endDate.toDate(),
+      label: `Level ${random(1, 8)}`,
+      backgroundColor: `#${floor(Math.random() * 16777215).toString(16)}`,
+      labelClass: '',
+    } as IEvent;
+  });
+};
+
+export const generateRandomEventsSameTime = (count?: number) => {
+  const weekDays = getWeekDays(moment().toDate());
+  return times(count || random(0, 8), () => {
+    const startDate = moment(sample(weekDays)).hours(8).minutes(0);
+    const endDate = moment(startDate).add(random(1, 6) * 30, 'minutes');
+
+    return {
+      eventId: `${random(999, 9999)}-${random(999, 9999)}-${random(999, 9999)}`,
+      startDate: startDate.toDate(),
+      endDate: endDate.toDate(),
+      label: `Level ${random(1, 8)}`,
+      backgroundColor: `#${floor(Math.random() * 16777215).toString(16)}`,
+      labelClass: '',
+    } as IEvent;
+  });
+};
+
+export const generateRandomEventsSameDate = (date: Date, count?: number) => {
+  return times(count || random(0, 8), () => {
+    const startDate = moment(date).hours(random(8, 19)).minutes(0);
+    const endDate = moment(startDate).add(random(1, 2) * 30, 'minutes');
 
     return {
       eventId: `${random(999, 9999)}-${random(999, 9999)}-${random(999, 9999)}`,

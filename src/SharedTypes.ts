@@ -4,13 +4,15 @@ export interface IViewProps {
   selectedDate: Date;
   locale: string;
   columns?: Array<IGridColumn>;
-  events?: Array<IEvent>;
+  events?: Array<IDayEvents>;
   eventRenderer?: (event: IEvent) => ReactElement;
+  mobileEventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (eventId: string) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   editMode?: boolean;
   gutterClassName?: string;
+  scrollToEarliest?: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -25,22 +27,25 @@ export interface IGridDayProps {
   editMode?: boolean;
   weekMode?: boolean;
   gutterClassName?: string;
+  scrollToEarliest?: boolean;
+  classNames?: string;
 }
 
 export interface IEvent {
   eventId: string;
   startDate: Date;
   endDate: Date;
-  backgroundColor: string;
-  label: string;
-  body: string;
-  color: string;
-  labelClass: string;
-  columnId: string;
-  rect: IEventRect;
-  renderer: (event: IEvent) => ReactElement;
-  onClick: (eventId: string) => void;
-  duration: number; // duration in minutes
+  backgroundColor?: string;
+  label?: string;
+  body?: string;
+  color?: string;
+  labelClass?: string;
+  columnId?: string;
+  rect?: IEventRect;
+  renderer?: (event: IEvent) => ReactElement;
+  onClick?: (eventId: IEvent) => void;
+  duration?: number; // duration in minutes
+  overlapingEvents?: number; // how many evetnts are overlapping
 }
 
 export interface IGridColumn {
@@ -49,6 +54,13 @@ export interface IGridColumn {
   columnData?: unknown; // any object to be associated with the column
   id?: string;
   date?: Date;
+  availability?: Array<IAvailabilityTime>;
+}
+
+export interface IAvailabilityTime {
+  weekDay: number;
+  startTime: string;
+  endTime: string;
 }
 
 export interface IEventRect {
@@ -56,9 +68,15 @@ export interface IEventRect {
   left: number;
   width: number;
   height: number;
+  zIndex: number;
 }
 
 export interface ITimeGap {
   from: Date;
   to: Date;
+}
+
+export interface IDayEvents {
+  date: string;
+  events: Array<IEvent>;
 }

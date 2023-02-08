@@ -95,6 +95,30 @@ const columns = [
 
 This will render one column that has 2 events.
 
+#### Overlapping events
+
+If some events are overlapping they are sorted by 3 things in this order: start date, duration, eventId. Note that eventId is random so if your events have the same start and end dates, they will appear on top of each other in random order.
+
+#### Availability
+
+To disable from clicking and grey out some of the cells that are use the `availability` object like so:
+
+```
+const columns = [
+  {
+    label: 'Court 1',
+    columnData: { id: '000-000-001', name: 'Court 1' }
+    availability: [{ weekDay: 1, startTime: '06:00', endTime: '19:00' }],
+  }
+];
+
+<GridCalendar
+    columns={columns}
+/>
+```
+
+Note that presense of empty `availability` array disables entire column for the day. To make entire day available remove the `availability` property.
+
 ### Week view
 
 You need to specify the list of events; Example:

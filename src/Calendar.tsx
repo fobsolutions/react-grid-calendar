@@ -15,10 +15,12 @@ export interface CalendarProps {
   columns?: Array<IGridColumn>; // grid columns
   events?: Array<IEvent>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
+  mobileEventRenderer?: (event: IEvent) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   gutterClassName?: string;
+  scrollToEarliest?: boolean;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -29,11 +31,13 @@ const Calendar = (props: CalendarProps) => {
     events,
     locale = 'en',
     eventRenderer,
+    mobileEventRenderer,
     eventOnClick,
     cellOnClick,
     columnHeaderRenderer,
     editMode,
     gutterClassName,
+    scrollToEarliest,
   } = props;
 
   // this sets the moment.js locale for entire package
@@ -49,10 +53,12 @@ const Calendar = (props: CalendarProps) => {
         events={events}
         editMode={editMode}
         eventRenderer={eventRenderer}
+        mobileEventRenderer={mobileEventRenderer}
         eventOnClick={eventOnClick}
         cellOnClick={cellOnClick}
         columnHeaderRenderer={columnHeaderRenderer}
         gutterClassName={gutterClassName}
+        scrollToEarliest={scrollToEarliest}
       />
     </div>
   );
