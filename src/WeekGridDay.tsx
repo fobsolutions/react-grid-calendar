@@ -16,6 +16,7 @@ import {
   some,
   filter,
   findIndex,
+  debounce,
 } from 'lodash';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
@@ -46,15 +47,20 @@ const WeekGridDay = (props: IGridDayProps) => {
     gutterClassName,
     classNames,
     scrollToEarliest = true,
+    collapseDays = true,
+    collapseToggle,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [gaps, setGaps] = useState<ITimeGap[]>([]);
+  const [isHidden, setIsHidden] = useState<boolean>(false);
   const gridWrapper = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const gridHeadrCols = useRef<HTMLDivElement>(null);
   const dayGridCols = useRef<HTMLDivElement>(null);
-  const refMap = new Map<string, RefObject<unknown>>();
+  const refMap = useRef<Map<string, RefObject<unknown>>>(
+    new Map<string, RefObject<unknown>>()
+  );
   const refDateFormat = 'yyyyMMDDHHmm'; // the moment.js format to use for formatting to find refs
 
   /**
@@ -150,10 +156,11 @@ const WeekGridDay = (props: IGridDayProps) => {
    */
   const positionEvents = (eventList: IEvent[]): IEvent[] => {
     return eventList.map((e: IEvent) => {
-      const gridElement = refMap.get(
+      const gridElement = refMap.current.get(
         `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
       );
-      const endGridElement = refMap.get(
+
+      const endGridElement = refMap.current.get(
         `${moment(e.endDate)
           .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
           .format(refDateFormat)}-${e.columnId}`
@@ -183,6 +190,18 @@ const WeekGridDay = (props: IGridDayProps) => {
       } as IEvent;
     });
   };
+
+  useEffect(() => {
+    const onWindowResize = debounce(() => {
+      redrawEvents();
+    }, 300);
+
+    window.addEventListener('resize', onWindowResize);
+    setIsHidden(moment(day).isBefore(moment().startOf('day')));
+    return () => {
+      window.removeEventListener('resize', onWindowResize);
+    };
+  }, [gridColumns]);
 
   useEffect(() => {
     if (columns?.length) {
@@ -233,12 +252,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, [gridColumns]);
 
   useEffect(() => {
-    const flatEvents = flatten(
-      gridColumns.map((col: IGridColumn) => col.events)
-    );
-    const evs: IEvent[] = positionEvents(flatEvents);
-
-    setEvents(evs);
+    redrawEvents();
   }, [gaps]);
 
   useEffect(() => {
@@ -262,7 +276,7 @@ const WeekGridDay = (props: IGridDayProps) => {
         ? moment.min(startDates)
         : moment(day).hours(8).minutes(0);
 
-      const firstEvent: RefObject<HTMLDivElement> = refMap.get(
+      const firstEvent: RefObject<HTMLDivElement> = refMap.current.get(
         earliest.format(refDateFormat)
       ) as RefObject<HTMLDivElement>;
 
@@ -280,6 +294,18 @@ const WeekGridDay = (props: IGridDayProps) => {
       }
     }
   }, [events]);
+
+  useEffect(() => {
+    redrawEvents();
+  }, [isHidden]);
+
+  const redrawEvents = () => {
+    const flatEvents = flatten(
+      gridColumns.map((col: IGridColumn) => col.events)
+    );
+    const evs: IEvent[] = positionEvents(flatEvents);
+    setEvents(evs);
+  };
 
   const scrollGrid = (event: UIEvent) => {
     dayGridCols?.current?.scrollTo({
@@ -303,9 +329,9 @@ const WeekGridDay = (props: IGridDayProps) => {
         .minutes(30); // TODO: use a step property instead of 30 minutes
 
       const hourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.set(h.format(refDateFormat), hourRef);
+      refMap.current.set(h.format(refDateFormat), hourRef);
       const halfHourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.set(m.format(refDateFormat), halfHourRef);
+      refMap.current.set(m.format(refDateFormat), halfHourRef);
 
       return isCollapsed(h, gaps) && !editMode ? ( // if the hour needs to be collapsed
         <div
@@ -324,7 +350,9 @@ const WeekGridDay = (props: IGridDayProps) => {
               gutterClassName || ''
             } day-grid-cell day-grid-gutter day-grid-hour`}
           >
-            <div ref={hourRef}>{h.format('H:mm')}</div>
+            <div className="time-half-hour" ref={hourRef}>
+              {h.format('H:mm')}
+            </div>
             <div ref={halfHourRef}>{m.format('H:mm')}</div>
           </div>
         </div>
@@ -394,16 +422,18 @@ const WeekGridDay = (props: IGridDayProps) => {
                     : m;
 
                   const hourCellRef: RefObject<HTMLDivElement> = createRef();
-                  refMap.set(
+                  refMap.current.set(
                     `${cellHour.format(refDateFormat)}-${c.id}`,
                     hourCellRef
                   );
+
                   const halfHourCellRef: RefObject<HTMLDivElement> =
                     createRef();
-                  refMap.set(
+                  refMap.current.set(
                     `${cellHalfHour.format(refDateFormat)}-${c.id}`,
                     halfHourCellRef
                   );
+
                   let isHourClickable = true;
                   let isHalfHourClickable = true;
 
@@ -508,14 +538,35 @@ const WeekGridDay = (props: IGridDayProps) => {
             className={`${gutterClassName || ''} day-grid-cell day-grid-gutter`}
           >
             {!weekMode && (
-              <>
-                <p className="day-weekday" data-testid="weekday">
-                  {moment(day).format('dddd')}
-                </p>
-                <p className="day-date" data-testid="cornerDate">
-                  {moment(day).format('MMMM-DD')}
-                </p>
-              </>
+              <div className="day-weekday-wrapper">
+                <div>
+                  <p className="day-weekday" data-testid="weekday">
+                    {moment(day).format('dddd')}
+                  </p>
+                  <p className="day-date" data-testid="cornerDate">
+                    {moment(day).format('MMMM-DD')}
+                  </p>
+                </div>
+                <div className="day-visibility-toggle">
+                  {collapseDays ? (
+                    <a
+                      onClick={() => {
+                        setIsHidden(!isHidden);
+                      }}
+                      role="button"
+                      href="#"
+                    >
+                      {collapseToggle ? (
+                        collapseToggle(isHidden)
+                      ) : (
+                        <>{isHidden ? 'show' : 'hide'}</>
+                      )}
+                    </a>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -531,7 +582,10 @@ const WeekGridDay = (props: IGridDayProps) => {
           ))}
         </div>
       </div>
-      <div className="day-container scroll-panel" ref={gridWrapper}>
+      <div
+        className={`day-container scroll-panel${isHidden ? ' hidden' : ''}`}
+        ref={gridWrapper}
+      >
         <div className="grid-container-events">
           <div ref={grid}>{dayGrid()}</div>
         </div>

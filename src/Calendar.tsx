@@ -23,6 +23,8 @@ export interface CalendarProps {
   gutterClassName?: string;
   scrollToEarliest?: boolean;
   scrollToToday?: boolean;
+  collapseDays?: boolean;
+  collapseToggle?: (collapsed: boolean) => ReactElement;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -42,6 +44,8 @@ const Calendar = (props: CalendarProps) => {
     gutterClassName,
     scrollToEarliest,
     scrollToToday,
+    collapseDays,
+    collapseToggle,
   } = props;
 
   // this sets the moment.js locale for entire package
@@ -65,6 +69,8 @@ const Calendar = (props: CalendarProps) => {
         gutterClassName={gutterClassName}
         scrollToEarliest={scrollToEarliest}
         scrollToToday={scrollToToday}
+        collapseDays={collapseDays}
+        collapseToggle={collapseToggle}
       />
     </div>
   );

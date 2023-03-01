@@ -34,6 +34,7 @@ WeekGridView.args = {
   editMode: true,
   columns: columnsMock,
   locale: 'en',
+  collapseDays: true,
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
   },

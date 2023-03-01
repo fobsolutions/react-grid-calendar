@@ -13,8 +13,8 @@ export const columnsMock: Array<IGridColumn> = [
     events: [
       {
         eventId: '9797-8366-3031',
-        startDate: moment('2022-12-12T06:00:00.000Z').toDate(),
-        endDate: moment('2022-12-12T07:30:00.000Z').toDate(),
+        startDate: moment('2023-03-01T06:00:00.000Z').toDate(),
+        endDate: moment('2023-03-01T07:30:00.000Z').toDate(),
         label: 'Level 4',
         backgroundColor: '#a9a73f',
         labelClass: '',
@@ -22,8 +22,8 @@ export const columnsMock: Array<IGridColumn> = [
       },
       {
         eventId: '7114-7209-7160',
-        startDate: moment('2022-12-12T06:00:00.000Z').toDate(),
-        endDate: moment('2022-12-12T09:00:00.000Z').toDate(),
+        startDate: moment('2023-03-02T06:00:00.000Z').toDate(),
+        endDate: moment('2023-03-02T09:00:00.000Z').toDate(),
         label: 'Level 1',
         backgroundColor: '#e23499',
         labelClass: '',
@@ -31,8 +31,8 @@ export const columnsMock: Array<IGridColumn> = [
       },
       {
         eventId: '9813-5868-6732',
-        startDate: moment('2022-12-12T06:00:00.000Z').toDate(),
-        endDate: moment('2022-12-12T06:30:00.000Z').toDate(),
+        startDate: moment('2023-03-03T06:00:00.000Z').toDate(),
+        endDate: moment('2023-03-03T06:30:00.000Z').toDate(),
         label: 'Level 7',
         backgroundColor: '#26658a',
         labelClass: '',

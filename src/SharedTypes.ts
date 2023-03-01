@@ -15,6 +15,8 @@ export interface IViewProps {
   gutterClassName?: string;
   scrollToEarliest?: boolean;
   scrollToToday?: boolean;
+  collapseDays?: boolean;
+  collapseToggle?: (collapsed: boolean) => ReactElement;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -32,6 +34,8 @@ export interface IGridDayProps {
   gutterClassName?: string;
   scrollToEarliest?: boolean;
   classNames?: string;
+  collapseDays?: boolean;
+  collapseToggle?: (collapsed: boolean) => ReactElement;
 }
 
 export interface IEvent {
