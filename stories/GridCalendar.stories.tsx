@@ -2,9 +2,9 @@ import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { GridCalendar } from '../src';
 import { columnsMock, weekEvents } from '../mocks/Columns';
-import { IEvent, IGridColumn } from '../src/SharedTypes';
+import { IDayEvents, IEvent, IGridColumn } from '../src/SharedTypes';
 import moment from 'moment';
-import { generateRandomEvents } from '../src/util';
+import { transpileModule } from 'typescript';
 
 const meta: Meta = {
   title: 'Grid calendar',
@@ -102,7 +102,7 @@ WeekView.args = {
       </div>
     );
   },
-  mobileEventRenderer: (event: IEvent) => {
+  mobileEventRenderer: (event: IEvent, date: string) => {
     return (
       <div
         style={{
@@ -120,8 +120,8 @@ WeekView.args = {
         ></div>
         <div style={{ padding: '5px' }}>
           <span>
-            Start: {moment(event.startDate).format('DD-MM HH:mm')} End:
-            {moment(event.endDate).format('HH:mm')}
+            {moment(date).format('DD-MM HH:mm')} End:
+            {moment(date).format('HH:mm')}
           </span>
         </div>
       </div>
@@ -132,6 +132,21 @@ WeekView.args = {
       <div>
         {col.label}
         <p>{moment(col.date).format('MMMM DD')}</p>
+      </div>
+    );
+  },
+  mobileDayHeaderRenderer: (e: IDayEvents) => {
+    return (
+      <div className="mobile-header">
+        <div className="mobile-header-divider">
+          <hr />
+        </div>
+        <div className="mobile-header-title">
+          {moment(e.date).format('dddd D.MM')}
+        </div>
+        <div className="mobile-header-divider">
+          <hr />
+        </div>
       </div>
     );
   },

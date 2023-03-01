@@ -6,13 +6,15 @@ export interface IViewProps {
   columns?: Array<IGridColumn>;
   events?: Array<IDayEvents>;
   eventRenderer?: (event: IEvent) => ReactElement;
-  mobileEventRenderer?: (event: IEvent) => ReactElement;
-  eventOnClick?: (eventId: string) => void;
+  mobileEventRenderer?: (event: IEvent, date?: string) => ReactElement;
+  eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
   editMode?: boolean;
   gutterClassName?: string;
   scrollToEarliest?: boolean;
+  scrollToToday?: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -21,9 +23,10 @@ export interface IGridDayProps {
   columns?: Array<IGridColumn>;
   locale: string;
   eventRenderer?: (event: IEvent) => ReactElement;
-  eventOnClick?: (eventId: string) => void;
+  eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
   editMode?: boolean;
   weekMode?: boolean;
   gutterClassName?: string;
@@ -43,9 +46,11 @@ export interface IEvent {
   columnId?: string;
   rect?: IEventRect;
   renderer?: (event: IEvent) => ReactElement;
-  onClick?: (eventId: IEvent) => void;
+  onClick?: (event: IEvent) => void;
   duration?: number; // duration in minutes
   overlapingEvents?: number; // how many evetnts are overlapping
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface IGridColumn {

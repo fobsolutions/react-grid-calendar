@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React, { ReactElement } from 'react';
-import { IEvent, IGridColumn } from './SharedTypes';
+import { IDayEvents, IEvent, IGridColumn } from './SharedTypes';
 import Views, { getViewFromString } from './Views';
 import './Main.css';
 
@@ -13,14 +13,16 @@ export interface CalendarProps {
   dateChanged?: () => void; // callback when the date was changed in the calendar
   locale?: string; // locale code to localize dates
   columns?: Array<IGridColumn>; // grid columns
-  events?: Array<IEvent>; // events
+  events?: Array<IDayEvents>; // events
   eventRenderer?: (event: IEvent) => ReactElement;
-  mobileEventRenderer?: (event: IEvent) => ReactElement;
+  mobileEventRenderer?: (event: IEvent, date?: string) => ReactElement;
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
+  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
   gutterClassName?: string;
   scrollToEarliest?: boolean;
+  scrollToToday?: boolean;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -35,9 +37,11 @@ const Calendar = (props: CalendarProps) => {
     eventOnClick,
     cellOnClick,
     columnHeaderRenderer,
+    mobileDayHeaderRenderer,
     editMode,
     gutterClassName,
     scrollToEarliest,
+    scrollToToday,
   } = props;
 
   // this sets the moment.js locale for entire package
@@ -57,12 +61,14 @@ const Calendar = (props: CalendarProps) => {
         eventOnClick={eventOnClick}
         cellOnClick={cellOnClick}
         columnHeaderRenderer={columnHeaderRenderer}
+        mobileDayHeaderRenderer={mobileDayHeaderRenderer}
         gutterClassName={gutterClassName}
         scrollToEarliest={scrollToEarliest}
+        scrollToToday={scrollToToday}
       />
     </div>
   );
 };
 
 export default Calendar;
-export { IGridColumn, IEvent } from './SharedTypes';
+export { IGridColumn, IEvent, IDayEvents } from './SharedTypes';

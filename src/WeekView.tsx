@@ -16,10 +16,12 @@ const WeekView = (props: IViewProps) => {
     events,
     eventRenderer,
     mobileEventRenderer,
+    mobileDayHeaderRenderer,
     eventOnClick,
     cellOnClick,
     columnHeaderRenderer,
     editMode,
+    scrollToToday,
   } = props;
 
   return (
@@ -27,8 +29,11 @@ const WeekView = (props: IViewProps) => {
       <WeekMobileView
         events={events}
         mobileEventRenderer={mobileEventRenderer}
+        mobileDayHeaderRenderer={mobileDayHeaderRenderer}
         locale={locale}
+        eventOnClick={eventOnClick}
         selectedDate={selectedDate}
+        scrollToToday={scrollToToday}
       />
       <WeekGridDay
         day={selectedDate}
