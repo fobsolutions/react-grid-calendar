@@ -295,8 +295,12 @@ const WeekGridDay = (props: IGridDayProps) => {
 
   const dayGrid = () => {
     const hours = times(24, (i) => {
-      const h = moment(day).hour(i).minutes(0);
-      const m = moment(day).hour(i).minutes(30); // TODO: use a step property instead of 30 minutes
+      const h = moment(weekMode ? new Date() : day)
+        .hour(i)
+        .minutes(0);
+      const m = moment(weekMode ? new Date() : day)
+        .hour(i)
+        .minutes(30); // TODO: use a step property instead of 30 minutes
 
       const hourRef: RefObject<HTMLDivElement> = createRef();
       refMap.set(h.format(refDateFormat), hourRef);

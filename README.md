@@ -149,6 +149,10 @@ const events = [
 
 This will render the week view with 2 events.
 
+#### Week mobile view
+
+The week view is responsive. It changes to mobile view at breakpoint 768px. Mobile event renderer and mobile day header are specified separatley from regular event renderer and column header renderer via `mobileEventRenderer` and `mobileDayHeaderRenderer` props.
+
 ## Display date
 
 The calendar library does not provide the UI to change the displayed week instead you can develop your own UI and simply specify the display date using the **displayDate** parameter and the library will display the week that this date falls into. Example:
