@@ -197,7 +197,10 @@ const WeekGridDay = (props: IGridDayProps) => {
     }, 300);
 
     window.addEventListener('resize', onWindowResize);
-    setIsHidden(moment(day).isBefore(moment().startOf('day')));
+    if (!weekMode) {
+      setIsHidden(moment(day).isBefore(moment().startOf('day')));
+    }
+
     return () => {
       window.removeEventListener('resize', onWindowResize);
     };
@@ -554,7 +557,6 @@ const WeekGridDay = (props: IGridDayProps) => {
                         setIsHidden(!isHidden);
                       }}
                       role="button"
-                      href="#"
                     >
                       {collapseToggle ? (
                         collapseToggle(isHidden)

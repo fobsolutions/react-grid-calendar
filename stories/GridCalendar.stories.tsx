@@ -31,7 +31,7 @@ export const WeekGridView = Template.bind({});
 
 WeekGridView.args = {
   view: 'weekgrid',
-  editMode: true,
+  editMode: false,
   columns: columnsMock,
   locale: 'en',
   collapseDays: true,
@@ -77,6 +77,7 @@ WeekView.args = {
   view: 'week',
   events: weekEvents(),
   locale: 'en',
+  displayDate: moment().subtract(2, 'weeks').toDate(),
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
   },
