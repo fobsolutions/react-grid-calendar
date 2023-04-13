@@ -101,6 +101,8 @@ If some events are overlapping they are sorted by 3 things in this order: start 
 
 #### Availability
 
+By default Calendar in Grid Mode hides the cells that are not inside of availability. If you want to display all the cells do not provie `availability` property in `columns` at all.
+
 To disable from clicking and grey out some of the cells that are use the `availability` object like so:
 
 ```
