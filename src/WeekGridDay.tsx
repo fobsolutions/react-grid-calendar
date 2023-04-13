@@ -322,6 +322,38 @@ const WeekGridDay = (props: IGridDayProps) => {
     });
   };
 
+  const cellAvailable = (
+    day: Date,
+    cellTime: Moment,
+    availability: IAvailabilityTime[],
+    withGaps = false
+  ) => {
+    const availabilities = filter(availability, {
+      weekDay: moment(day).isoWeekday(),
+    });
+
+    const minToMax = {
+      startTime: moment
+        .min(availabilities.map((a) => moment(a.startTime, 'HH:mm')))
+        .format('HH:mm'),
+      endTime: moment
+        .max(availabilities.map((a) => moment(a.endTime, 'HH:mm')))
+        .format('HH:mm'),
+      weekDay: moment(day).isoWeekday(),
+    } as IAvailabilityTime;
+
+    return some(
+      withGaps ? [minToMax] : availabilities,
+      (availability: IAvailabilityTime) => {
+        const cellMoment = moment(cellTime.format('HH:mm'), 'HH:mm');
+        return (
+          cellMoment.isSameOrAfter(moment(availability.startTime, 'HH:mm')) &&
+          cellMoment.isBefore(moment(availability.endTime, 'HH:mm'))
+        );
+      }
+    );
+  };
+
   const dayGrid = () => {
     const hours = times(24, (i) => {
       const h = moment(weekMode ? new Date() : day)
@@ -336,7 +368,27 @@ const WeekGridDay = (props: IGridDayProps) => {
       const halfHourRef: RefObject<HTMLDivElement> = createRef();
       refMap.current.set(m.format(refDateFormat), halfHourRef);
 
-      return isCollapsed(h, gaps) && !editMode ? ( // if the hour needs to be collapsed
+      // see if the hour needs to be skipped:
+      const hourUnavailable = !some(columns, (col) => {
+        return !col.availability
+          ? true
+          : cellAvailable(day, h, col.availability, true);
+      });
+      const halfHourUnavailable = !some(columns, (col) => {
+        return !col.availability
+          ? true
+          : cellAvailable(day, m, col.availability, true);
+      });
+
+      if (hourUnavailable && halfHourUnavailable) {
+        return (
+          <div key={`hour-row-${i}`}>
+            <div></div>
+          </div>
+        );
+      }
+
+      return !editMode && isCollapsed(h, gaps) ? ( // if the hour needs to be collapsed
         <div
           key={`hour-row-${i}`}
           className={`${
@@ -439,59 +491,43 @@ const WeekGridDay = (props: IGridDayProps) => {
 
                   let isHourClickable = true;
                   let isHalfHourClickable = true;
+                  let hourUnavailable = false;
+                  let halfHourUnavailable = false;
 
                   if (c.availability) {
-                    isHourClickable = true;
-                    isHalfHourClickable = true;
-
                     // see if the HOUR cell in the availabilty
-                    if (
-                      !some(
-                        filter(c.availability, {
-                          weekDay: moment(day).isoWeekday(),
-                        }),
-                        (availability: IAvailabilityTime) => {
-                          const cellMoment = moment(
-                            cellHour.format('HH:mm'),
-                            'HH:mm'
-                          );
-                          return (
-                            cellMoment.isSameOrAfter(
-                              moment(availability.startTime, 'HH:mm')
-                            ) &&
-                            cellMoment.isBefore(
-                              moment(availability.endTime, 'HH:mm')
-                            )
-                          );
-                        }
-                      )
-                    ) {
-                      isHourClickable = false;
-                    }
+                    isHourClickable = cellAvailable(
+                      day,
+                      cellHour,
+                      c.availability
+                    );
+
                     // see if the HALF-HOUR cell in the availabilty
-                    if (
-                      !some(
-                        filter(c.availability, {
-                          weekDay: moment(day).isoWeekday(),
-                        }),
-                        (availability: IAvailabilityTime) => {
-                          const cellMoment = moment(
-                            cellHalfHour.format('HH:mm'),
-                            'HH:mm'
-                          );
-                          return (
-                            cellMoment.isSameOrAfter(
-                              moment(availability.startTime, 'HH:mm')
-                            ) &&
-                            cellMoment.isBefore(
-                              moment(availability.endTime, 'HH:mm')
-                            )
-                          );
-                        }
-                      )
-                    ) {
-                      isHalfHourClickable = false;
-                    }
+                    isHalfHourClickable = cellAvailable(
+                      day,
+                      cellHalfHour,
+                      c.availability
+                    );
+
+                    hourUnavailable = !some(columns, (col) => {
+                      return !col.availability
+                        ? true
+                        : cellAvailable(day, h, col.availability, true);
+                    });
+
+                    halfHourUnavailable = !some(columns, (col) => {
+                      return !col.availability
+                        ? true
+                        : cellAvailable(day, m, col.availability, true);
+                    });
+                  }
+                  //  else {
+                  //   hourUnavailable = true;
+                  //   halfHourUnavailable = true;
+                  // }
+
+                  if (hourUnavailable && halfHourUnavailable) {
+                    return <div key={`column-${i}`}></div>;
                   }
                   return (
                     <div
