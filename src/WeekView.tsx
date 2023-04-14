@@ -14,6 +14,7 @@ const WeekView = (props: IViewProps) => {
     locale,
     columns,
     events,
+    hideUnavailableTime,
     eventRenderer,
     mobileEventRenderer,
     mobileDayHeaderRenderer,
@@ -50,6 +51,7 @@ const WeekView = (props: IViewProps) => {
         }
         locale={locale}
         editMode={editMode}
+        hideUnavailableTime={hideUnavailableTime}
         eventRenderer={eventRenderer}
         eventOnClick={eventOnClick}
         cellOnClick={cellOnClick}

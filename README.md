@@ -224,3 +224,7 @@ To specify the locale to be used in the calendar simply specify 2-letter locale 
     locale='es'
 />
 ```
+
+## Hiding time slots in Week Mode
+
+In order to display only the tme slots in Week Mode that start from earliest event and ends at latest use the prop `hideUnavailableTime={true}`

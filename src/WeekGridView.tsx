@@ -16,6 +16,7 @@ const WeekGridView = (props: IViewProps) => {
     cellOnClick,
     columnHeaderRenderer,
     editMode,
+    hideUnavailableTime,
     gutterClassName,
     scrollToEarliest,
     collapseDays,
@@ -31,6 +32,7 @@ const WeekGridView = (props: IViewProps) => {
           columns={columns}
           locale={locale}
           editMode={editMode}
+          hideUnavailableTime={hideUnavailableTime}
           eventRenderer={eventRenderer}
           eventOnClick={eventOnClick}
           cellOnClick={cellOnClick}

@@ -17,6 +17,7 @@ import {
   filter,
   findIndex,
   debounce,
+  isUndefined,
 } from 'lodash';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
@@ -42,6 +43,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     eventOnClick,
     cellOnClick,
     editMode,
+    hideUnavailableTime,
     columnHeaderRenderer,
     weekMode,
     gutterClassName,
@@ -354,6 +356,44 @@ const WeekGridDay = (props: IGridDayProps) => {
     );
   };
 
+  const weekModeCellAvailable = (cols: IGridColumn[], cellTime: Moment) => {
+    const weekEventStarts = flatten(
+      cols.map((col) =>
+        col.events.map((ev) =>
+          cellTime.clone().set({
+            hours: ev.startDate.getHours(),
+            minutes: ev.startDate.getMinutes(),
+          })
+        )
+      )
+    );
+    const weekEventEnds = flatten(
+      cols.map((col) =>
+        col.events.map((ev) =>
+          cellTime.clone().set({
+            hours: ev.endDate.getHours(),
+            minutes: ev.endDate.getMinutes(),
+          })
+        )
+      )
+    );
+
+    // if there are no events at all display range from 8 to 18
+    const ealiestEventStart = weekEventStarts.length
+      ? moment.min(weekEventStarts.map((a) => moment(a, 'HH:mm')))
+      : cellTime.clone().set({ hour: 8, minute: 0 });
+    const latestEventEnd = weekEventEnds.length
+      ? moment.max(weekEventEnds.map((a) => moment(a, 'HH:mm')))
+      : cellTime.clone().set({ hour: 18, minute: 0 });
+
+    return cellTime.isBetween(
+      ealiestEventStart,
+      latestEventEnd,
+      undefined,
+      '[)'
+    );
+  };
+
   const dayGrid = () => {
     const hours = times(24, (i) => {
       const h = moment(weekMode ? new Date() : day)
@@ -369,23 +409,29 @@ const WeekGridDay = (props: IGridDayProps) => {
       refMap.current.set(m.format(refDateFormat), halfHourRef);
 
       // see if the hour needs to be skipped:
-      const hourUnavailable = !some(columns, (col) => {
-        return !col.availability
-          ? true
-          : cellAvailable(day, h, col.availability, true);
-      });
-      const halfHourUnavailable = !some(columns, (col) => {
-        return !col.availability
-          ? true
-          : cellAvailable(day, m, col.availability, true);
-      });
+      if (hideUnavailableTime) {
+        const hourUnavailable = weekMode
+          ? !weekModeCellAvailable(columns || [], h)
+          : !some(columns, (col) => {
+              return !col.availability
+                ? true
+                : cellAvailable(day, h, col.availability, true);
+            });
+        const halfHourUnavailable = weekMode
+          ? !weekModeCellAvailable(columns || [], m)
+          : !some(columns, (col) => {
+              return !col.availability
+                ? true
+                : cellAvailable(day, m, col.availability, true);
+            });
 
-      if (hourUnavailable && halfHourUnavailable) {
-        return (
-          <div key={`hour-row-${i}`}>
-            <div></div>
-          </div>
-        );
+        if (hourUnavailable && halfHourUnavailable) {
+          return (
+            <div key={`hour-row-${i}`}>
+              <div></div>
+            </div>
+          );
+        }
       }
 
       return !editMode && isCollapsed(h, gaps) ? ( // if the hour needs to be collapsed
@@ -494,37 +540,39 @@ const WeekGridDay = (props: IGridDayProps) => {
                   let hourUnavailable = false;
                   let halfHourUnavailable = false;
 
-                  if (c.availability) {
+                  if (c.availability || weekMode) {
                     // see if the HOUR cell in the availabilty
-                    isHourClickable = cellAvailable(
-                      day,
-                      cellHour,
-                      c.availability
-                    );
+                    isHourClickable = weekMode
+                      ? true
+                      : !isUndefined(c.availability)
+                      ? cellAvailable(day, cellHour, c.availability)
+                      : false;
 
                     // see if the HALF-HOUR cell in the availabilty
-                    isHalfHourClickable = cellAvailable(
-                      day,
-                      cellHalfHour,
-                      c.availability
-                    );
+                    isHalfHourClickable = weekMode
+                      ? true
+                      : !isUndefined(c.availability)
+                      ? cellAvailable(day, cellHalfHour, c.availability)
+                      : false;
 
-                    hourUnavailable = !some(columns, (col) => {
-                      return !col.availability
-                        ? true
-                        : cellAvailable(day, h, col.availability, true);
-                    });
+                    if (hideUnavailableTime) {
+                      hourUnavailable = weekMode
+                        ? !weekModeCellAvailable(columns || [], h)
+                        : !some(columns, (col) => {
+                            return !col.availability
+                              ? true
+                              : cellAvailable(day, h, col.availability, true);
+                          });
 
-                    halfHourUnavailable = !some(columns, (col) => {
-                      return !col.availability
-                        ? true
-                        : cellAvailable(day, m, col.availability, true);
-                    });
+                      halfHourUnavailable = weekMode
+                        ? !weekModeCellAvailable(columns || [], m)
+                        : !some(columns, (col) => {
+                            return !col.availability
+                              ? true
+                              : cellAvailable(day, m, col.availability, true);
+                          });
+                    }
                   }
-                  //  else {
-                  //   hourUnavailable = true;
-                  //   halfHourUnavailable = true;
-                  // }
 
                   if (hourUnavailable && halfHourUnavailable) {
                     return <div key={`column-${i}`}></div>;

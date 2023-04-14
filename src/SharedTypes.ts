@@ -12,6 +12,7 @@ export interface IViewProps {
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
   editMode?: boolean;
+  hideUnavailableTime?: boolean;
   gutterClassName?: string;
   scrollToEarliest?: boolean;
   scrollToToday?: boolean;
@@ -30,6 +31,7 @@ export interface IGridDayProps {
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
   mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
   editMode?: boolean;
+  hideUnavailableTime?: boolean;
   weekMode?: boolean;
   gutterClassName?: string;
   scrollToEarliest?: boolean;

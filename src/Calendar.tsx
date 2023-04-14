@@ -7,6 +7,7 @@ import './Main.css';
 export interface CalendarProps {
   view: string;
   editMode?: boolean;
+  hideUnavailableTime?: boolean;
   displayDate?: Date;
   stepForwad?: () => void; // function to go a step forward
   stepBack?: () => void; // function to go a step back
@@ -41,6 +42,7 @@ const Calendar = (props: CalendarProps) => {
     columnHeaderRenderer,
     mobileDayHeaderRenderer,
     editMode,
+    hideUnavailableTime,
     gutterClassName,
     scrollToEarliest,
     scrollToToday,
@@ -60,6 +62,7 @@ const Calendar = (props: CalendarProps) => {
         columns={columns}
         events={events}
         editMode={editMode}
+        hideUnavailableTime={hideUnavailableTime}
         eventRenderer={eventRenderer}
         mobileEventRenderer={mobileEventRenderer}
         eventOnClick={eventOnClick}
