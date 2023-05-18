@@ -16,6 +16,8 @@ import {
   some,
   filter,
   findIndex,
+  debounce,
+  isUndefined,
 } from 'lodash';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
@@ -41,20 +43,26 @@ const WeekGridDay = (props: IGridDayProps) => {
     eventOnClick,
     cellOnClick,
     editMode,
+    hideUnavailableTime,
     columnHeaderRenderer,
     weekMode,
     gutterClassName,
     classNames,
     scrollToEarliest = true,
+    collapseDays = true,
+    collapseToggle,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [gaps, setGaps] = useState<ITimeGap[]>([]);
+  const [isHidden, setIsHidden] = useState<boolean>(false);
   const gridWrapper = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const gridHeadrCols = useRef<HTMLDivElement>(null);
   const dayGridCols = useRef<HTMLDivElement>(null);
-  const refMap = new Map<string, RefObject<unknown>>();
+  const refMap = useRef<Map<string, RefObject<unknown>>>(
+    new Map<string, RefObject<unknown>>()
+  );
   const refDateFormat = 'yyyyMMDDHHmm'; // the moment.js format to use for formatting to find refs
 
   /**
@@ -150,10 +158,11 @@ const WeekGridDay = (props: IGridDayProps) => {
    */
   const positionEvents = (eventList: IEvent[]): IEvent[] => {
     return eventList.map((e: IEvent) => {
-      const gridElement = refMap.get(
+      const gridElement = refMap.current.get(
         `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
       );
-      const endGridElement = refMap.get(
+
+      const endGridElement = refMap.current.get(
         `${moment(e.endDate)
           .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
           .format(refDateFormat)}-${e.columnId}`
@@ -183,6 +192,21 @@ const WeekGridDay = (props: IGridDayProps) => {
       } as IEvent;
     });
   };
+
+  useEffect(() => {
+    const onWindowResize = debounce(() => {
+      redrawEvents();
+    }, 300);
+
+    window.addEventListener('resize', onWindowResize);
+    if (!weekMode) {
+      setIsHidden(moment(day).isBefore(moment().startOf('day')));
+    }
+
+    return () => {
+      window.removeEventListener('resize', onWindowResize);
+    };
+  }, [gridColumns]);
 
   useEffect(() => {
     if (columns?.length) {
@@ -233,12 +257,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   }, [gridColumns]);
 
   useEffect(() => {
-    const flatEvents = flatten(
-      gridColumns.map((col: IGridColumn) => col.events)
-    );
-    const evs: IEvent[] = positionEvents(flatEvents);
-
-    setEvents(evs);
+    redrawEvents();
   }, [gaps]);
 
   useEffect(() => {
@@ -262,7 +281,7 @@ const WeekGridDay = (props: IGridDayProps) => {
         ? moment.min(startDates)
         : moment(day).hours(8).minutes(0);
 
-      const firstEvent: RefObject<HTMLDivElement> = refMap.get(
+      const firstEvent: RefObject<HTMLDivElement> = refMap.current.get(
         earliest.format(refDateFormat)
       ) as RefObject<HTMLDivElement>;
 
@@ -281,6 +300,18 @@ const WeekGridDay = (props: IGridDayProps) => {
     }
   }, [events]);
 
+  useEffect(() => {
+    redrawEvents();
+  }, [isHidden]);
+
+  const redrawEvents = () => {
+    const flatEvents = flatten(
+      gridColumns.map((col: IGridColumn) => col.events)
+    );
+    const evs: IEvent[] = positionEvents(flatEvents);
+    setEvents(evs);
+  };
+
   const scrollGrid = (event: UIEvent) => {
     dayGridCols?.current?.scrollTo({
       left: (event.target as Element).scrollLeft,
@@ -293,6 +324,76 @@ const WeekGridDay = (props: IGridDayProps) => {
     });
   };
 
+  const cellAvailable = (
+    day: Date,
+    cellTime: Moment,
+    availability: IAvailabilityTime[],
+    withGaps = false
+  ) => {
+    const availabilities = filter(availability, {
+      weekDay: moment(day).isoWeekday(),
+    });
+
+    const minToMax = {
+      startTime: moment
+        .min(availabilities.map((a) => moment(a.startTime, 'HH:mm')))
+        .format('HH:mm'),
+      endTime: moment
+        .max(availabilities.map((a) => moment(a.endTime, 'HH:mm')))
+        .format('HH:mm'),
+      weekDay: moment(day).isoWeekday(),
+    } as IAvailabilityTime;
+
+    return some(
+      withGaps ? [minToMax] : availabilities,
+      (availability: IAvailabilityTime) => {
+        const cellMoment = moment(cellTime.format('HH:mm'), 'HH:mm');
+        return (
+          cellMoment.isSameOrAfter(moment(availability.startTime, 'HH:mm')) &&
+          cellMoment.isBefore(moment(availability.endTime, 'HH:mm'))
+        );
+      }
+    );
+  };
+
+  const weekModeCellAvailable = (cols: IGridColumn[], cellTime: Moment) => {
+    const weekEventStarts = flatten(
+      cols.map((col) =>
+        col.events.map((ev) => {
+          return cellTime.clone().set({
+            hours: ev.startDate.getHours(),
+            minutes: ev.startDate.getMinutes(),
+          });
+        })
+      )
+    );
+    const weekEventEnds = flatten(
+      cols.map((col) =>
+        col.events.map((ev) =>
+          cellTime.clone().set({
+            hours: ev.endDate.getHours(),
+            minutes: ev.endDate.getMinutes(),
+          })
+        )
+      )
+    );
+
+    // if there are no events at all display range from 8 to 18
+    const ealiestEventStart = weekEventStarts.length
+      ? moment.min(weekEventStarts)
+      : cellTime.clone().set({ hour: 8, minute: 0 });
+    const latestEventEnd = weekEventEnds.length
+      ? moment.max(weekEventEnds)
+      : cellTime.clone().set({ hour: 18, minute: 0 });
+
+    return cellTime.isBetween(
+      ealiestEventStart,
+      latestEventEnd,
+      undefined,
+      '[)'
+    );
+  };
+
   const dayGrid = () => {
     const hours = times(24, (i) => {
       const h = moment(weekMode ? new Date() : day)
@@ -303,11 +404,37 @@ const WeekGridDay = (props: IGridDayProps) => {
         .minutes(30); // TODO: use a step property instead of 30 minutes
 
       const hourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.set(h.format(refDateFormat), hourRef);
+      refMap.current.set(h.format(refDateFormat), hourRef);
       const halfHourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.set(m.format(refDateFormat), halfHourRef);
+      refMap.current.set(m.format(refDateFormat), halfHourRef);
 
-      return isCollapsed(h, gaps) && !editMode ? ( // if the hour needs to be collapsed
+      // see if the hour needs to be skipped:
+      if (hideUnavailableTime) {
+        const hourUnavailable = weekMode
+          ? !weekModeCellAvailable(columns || [], h)
+          : !some(columns, (col) => {
+              return !col.availability
+                ? true
+                : cellAvailable(day, h, col.availability, true);
+            });
+        const halfHourUnavailable = weekMode
+          ? !weekModeCellAvailable(columns || [], m)
+          : !some(columns, (col) => {
+              return !col.availability
+                ? true
+                : cellAvailable(day, m, col.availability, true);
+            });
+
+        if (hourUnavailable && halfHourUnavailable) {
+          return (
+            <div key={`hour-row-${i}`}>
+              <div></div>
+            </div>
+          );
+        }
+      }
+
+      return !editMode && isCollapsed(h, gaps) ? ( // if the hour needs to be collapsed
         <div
           key={`hour-row-${i}`}
           className={`${
@@ -324,7 +451,9 @@ const WeekGridDay = (props: IGridDayProps) => {
               gutterClassName || ''
             } day-grid-cell day-grid-gutter day-grid-hour`}
           >
-            <div ref={hourRef}>{h.format('H:mm')}</div>
+            <div className="time-half-hour" ref={hourRef}>
+              {h.format('H:mm')}
+            </div>
             <div ref={halfHourRef}>{m.format('H:mm')}</div>
           </div>
         </div>
@@ -394,71 +523,59 @@ const WeekGridDay = (props: IGridDayProps) => {
                     : m;
 
                   const hourCellRef: RefObject<HTMLDivElement> = createRef();
-                  refMap.set(
+                  refMap.current.set(
                     `${cellHour.format(refDateFormat)}-${c.id}`,
                     hourCellRef
                   );
+
                   const halfHourCellRef: RefObject<HTMLDivElement> =
                     createRef();
-                  refMap.set(
+                  refMap.current.set(
                     `${cellHalfHour.format(refDateFormat)}-${c.id}`,
                     halfHourCellRef
                   );
+
                   let isHourClickable = true;
                   let isHalfHourClickable = true;
+                  let hourUnavailable = false;
+                  let halfHourUnavailable = false;
 
-                  if (c.availability) {
-                    isHourClickable = true;
-                    isHalfHourClickable = true;
-
+                  if (c.availability || weekMode) {
                     // see if the HOUR cell in the availabilty
-                    if (
-                      !some(
-                        filter(c.availability, {
-                          weekDay: moment(day).isoWeekday(),
-                        }),
-                        (availability: IAvailabilityTime) => {
-                          const cellMoment = moment(
-                            cellHour.format('HH:mm'),
-                            'HH:mm'
-                          );
-                          return (
-                            cellMoment.isSameOrAfter(
-                              moment(availability.startTime, 'HH:mm')
-                            ) &&
-                            cellMoment.isBefore(
-                              moment(availability.endTime, 'HH:mm')
-                            )
-                          );
-                        }
-                      )
-                    ) {
-                      isHourClickable = false;
-                    }
+                    isHourClickable = weekMode
+                      ? true
+                      : !isUndefined(c.availability)
+                      ? cellAvailable(day, cellHour, c.availability)
+                      : false;
+
                     // see if the HALF-HOUR cell in the availabilty
-                    if (
-                      !some(
-                        filter(c.availability, {
-                          weekDay: moment(day).isoWeekday(),
-                        }),
-                        (availability: IAvailabilityTime) => {
-                          const cellMoment = moment(
-                            cellHalfHour.format('HH:mm'),
-                            'HH:mm'
-                          );
-                          return (
-                            cellMoment.isSameOrAfter(
-                              moment(availability.startTime, 'HH:mm')
-                            ) &&
-                            cellMoment.isBefore(
-                              moment(availability.endTime, 'HH:mm')
-                            )
-                          );
-                        }
-                      )
-                    ) {
-                      isHalfHourClickable = false;
+                    isHalfHourClickable = weekMode
+                      ? true
+                      : !isUndefined(c.availability)
+                      ? cellAvailable(day, cellHalfHour, c.availability)
+                      : false;
+
+                    if (hideUnavailableTime) {
+                      hourUnavailable = weekMode
+                        ? !weekModeCellAvailable(columns || [], h)
+                        : !some(columns, (col) => {
+                            return !col.availability
+                              ? true
+                              : cellAvailable(day, h, col.availability, true);
+                          });
+
+                      halfHourUnavailable = weekMode
+                        ? !weekModeCellAvailable(columns || [], m)
+                        : !some(columns, (col) => {
+                            return !col.availability
+                              ? true
+                              : cellAvailable(day, m, col.availability, true);
+                          });
                     }
+                  }
+
+                  if (hourUnavailable && halfHourUnavailable) {
+                    return <div key={`column-${i}`}></div>;
                   }
                   return (
                     <div
@@ -508,14 +625,34 @@ const WeekGridDay = (props: IGridDayProps) => {
             className={`${gutterClassName || ''} day-grid-cell day-grid-gutter`}
           >
             {!weekMode && (
-              <>
-                <p className="day-weekday" data-testid="weekday">
-                  {moment(day).format('dddd')}
-                </p>
-                <p className="day-date" data-testid="cornerDate">
-                  {moment(day).format('MMMM-DD')}
-                </p>
-              </>
+              <div className="day-weekday-wrapper">
+                <div>
+                  <p className="day-weekday" data-testid="weekday">
+                    {moment(day).format('dddd')}
+                  </p>
+                  <p className="day-date" data-testid="cornerDate">
+                    {moment(day).format('MMMM-DD')}
+                  </p>
+                </div>
+                <div className="day-visibility-toggle">
+                  {collapseDays ? (
+                    <a
+                      onClick={() => {
+                        setIsHidden(!isHidden);
+                      }}
+                      role="button"
+                    >
+                      {collapseToggle ? (
+                        collapseToggle(isHidden)
+                      ) : (
+                        <>{isHidden ? 'show' : 'hide'}</>
+                      )}
+                    </a>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -531,7 +668,10 @@ const WeekGridDay = (props: IGridDayProps) => {
           ))}
         </div>
       </div>
-      <div className="day-container scroll-panel" ref={gridWrapper}>
+      <div
+        className={`day-container scroll-panel${isHidden ? ' hidden' : ''}`}
+        ref={gridWrapper}
+      >
         <div className="grid-container-events">
           <div ref={grid}>{dayGrid()}</div>
         </div>

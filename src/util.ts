@@ -54,9 +54,8 @@ export const generateRandomEventsSameTime = (count?: number) => {
 
 export const generateRandomEventsSameDate = (date: Date, count?: number) => {
   return times(count || random(0, 8), () => {
-    const startDate = moment(date).hours(random(8, 19)).minutes(0);
+    const startDate = moment(date).hours(random(6, 19)).minutes(0);
     const endDate = moment(startDate).add(random(1, 2) * 30, 'minutes');
-
     return {
       eventId: `${random(999, 9999)}-${random(999, 9999)}-${random(999, 9999)}`,
       startDate: startDate.toDate(),

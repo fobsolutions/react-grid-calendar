@@ -101,6 +101,8 @@ If some events are overlapping they are sorted by 3 things in this order: start 
 
 #### Availability
 
+By default Calendar in Grid Mode hides the cells that are not inside of availability. If you want to display all the cells do not provie `availability` property in `columns` at all.
+
 To disable from clicking and grey out some of the cells that are use the `availability` object like so:
 
 ```
@@ -222,3 +224,11 @@ To specify the locale to be used in the calendar simply specify 2-letter locale 
     locale='es'
 />
 ```
+
+## Hiding time slots in Week Mode
+
+In order to display only the tme slots in Week Mode that start from earliest event and ends at latest use the prop `hideUnavailableTime={true}`
+
+## Collapsable days in mobile view
+
+By default the days in the mobile view are collapsable, meaning that the days in the past will be collapsed initially and all days can be collapsed or expanded by clicking on the day header. To disable this functionality use the `mobileDayCollapsable` prop.

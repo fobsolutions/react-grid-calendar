@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, { useEffect, useRef } from 'react';
 import { IViewProps } from './SharedTypes';
+import MobileDayRenderer from './MobileDayRenderer';
 
 const WeekMobileView = (props: IViewProps) => {
   const {
@@ -9,6 +10,7 @@ const WeekMobileView = (props: IViewProps) => {
     mobileDayHeaderRenderer,
     eventOnClick,
     scrollToToday,
+    mobileDayCollapsable,
   } = props;
 
   const todayElement = useRef<HTMLDivElement>(null);
@@ -27,41 +29,14 @@ const WeekMobileView = (props: IViewProps) => {
             key={e.date}
             ref={moment(e.date).isSame(new Date(), 'day') ? todayElement : null}
           >
-            {mobileDayHeaderRenderer ? (
-              mobileDayHeaderRenderer(e)
-            ) : (
-              <div className="mobile-header">
-                <div className="mobile-header-divider">
-                  <hr />
-                </div>
-                <div className="mobile-header-title">{e.date}</div>
-                <div className="mobile-header-divider">
-                  <hr />
-                </div>
-              </div>
-            )}
-            {e.events.map((event) => {
-              return (
-                <div
-                  key={event.eventId}
-                  className="calendar-event"
-                  onClick={() => {
-                    eventOnClick ? eventOnClick(event) : null;
-                  }}
-                  role="button"
-                >
-                  {mobileEventRenderer ? (
-                    mobileEventRenderer(event, e.date)
-                  ) : (
-                    <div className="calendar-event-body">
-                      <span className={`${event.labelClass}`}>
-                        {event.label}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            <MobileDayRenderer
+              eventsDay={e}
+              mobileEventRenderer={mobileEventRenderer}
+              mobileDayHeaderRenderer={mobileDayHeaderRenderer}
+              eventOnClick={eventOnClick}
+              hidden={moment(e.date).isBefore(new Date(), 'day')}
+              isCollapsable={mobileDayCollapsable}
+            />
           </div>
         );
       })}

@@ -14,6 +14,7 @@ const WeekView = (props: IViewProps) => {
     locale,
     columns,
     events,
+    hideUnavailableTime,
     eventRenderer,
     mobileEventRenderer,
     mobileDayHeaderRenderer,
@@ -22,6 +23,7 @@ const WeekView = (props: IViewProps) => {
     columnHeaderRenderer,
     editMode,
     scrollToToday,
+    mobileDayCollapsable,
   } = props;
 
   return (
@@ -34,6 +36,7 @@ const WeekView = (props: IViewProps) => {
         eventOnClick={eventOnClick}
         selectedDate={selectedDate}
         scrollToToday={scrollToToday}
+        mobileDayCollapsable={mobileDayCollapsable}
       />
       <WeekGridDay
         day={selectedDate}
@@ -50,6 +53,7 @@ const WeekView = (props: IViewProps) => {
         }
         locale={locale}
         editMode={editMode}
+        hideUnavailableTime={hideUnavailableTime}
         eventRenderer={eventRenderer}
         eventOnClick={eventOnClick}
         cellOnClick={cellOnClick}
