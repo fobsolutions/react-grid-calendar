@@ -359,12 +359,12 @@ const WeekGridDay = (props: IGridDayProps) => {
   const weekModeCellAvailable = (cols: IGridColumn[], cellTime: Moment) => {
     const weekEventStarts = flatten(
       cols.map((col) =>
-        col.events.map((ev) =>
-          cellTime.clone().set({
+        col.events.map((ev) => {
+          return cellTime.clone().set({
             hours: ev.startDate.getHours(),
             minutes: ev.startDate.getMinutes(),
-          })
-        )
+          });
+        })
       )
     );
     const weekEventEnds = flatten(
@@ -380,10 +380,10 @@ const WeekGridDay = (props: IGridDayProps) => {
 
     // if there are no events at all display range from 8 to 18
     const ealiestEventStart = weekEventStarts.length
-      ? moment.min(weekEventStarts.map((a) => moment(a, 'HH:mm')))
+      ? moment.min(weekEventStarts)
       : cellTime.clone().set({ hour: 8, minute: 0 });
     const latestEventEnd = weekEventEnds.length
-      ? moment.max(weekEventEnds.map((a) => moment(a, 'HH:mm')))
+      ? moment.max(weekEventEnds)
       : cellTime.clone().set({ hour: 18, minute: 0 });
 
     return cellTime.isBetween(

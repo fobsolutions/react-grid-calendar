@@ -228,3 +228,7 @@ To specify the locale to be used in the calendar simply specify 2-letter locale 
 ## Hiding time slots in Week Mode
 
 In order to display only the tme slots in Week Mode that start from earliest event and ends at latest use the prop `hideUnavailableTime={true}`
+
+## Collapsable days in mobile view
+
+By default the days in the mobile view are collapsable, meaning that the days in the past will be collapsed initially and all days can be collapsed or expanded by clicking on the day header. To disable this functionality use the `mobileDayCollapsable` prop.

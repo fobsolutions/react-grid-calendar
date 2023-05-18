@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 import React, { ReactElement } from 'react';
 import { IDayEvents, IEvent, IGridColumn } from './SharedTypes';
 import Views, { getViewFromString } from './Views';
@@ -20,12 +20,17 @@ export interface CalendarProps {
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
-  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
+  mobileDayHeaderRenderer?: (
+    dayEvents: IDayEvents,
+    toggleDisplay?: () => void,
+    isShowing?: boolean
+  ) => ReactElement;
   gutterClassName?: string;
   scrollToEarliest?: boolean;
   scrollToToday?: boolean;
   collapseDays?: boolean;
   collapseToggle?: (collapsed: boolean) => ReactElement;
+  mobileDayCollapsable?: boolean;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -48,10 +53,12 @@ const Calendar = (props: CalendarProps) => {
     scrollToToday,
     collapseDays,
     collapseToggle,
+    mobileDayCollapsable,
   } = props;
 
   // this sets the moment.js locale for entire package
   moment.locale(locale);
+  // moment.tz.setDefault('Europe/London');
 
   const CalendarView = Views[getViewFromString(view)];
 
@@ -74,6 +81,7 @@ const Calendar = (props: CalendarProps) => {
         scrollToToday={scrollToToday}
         collapseDays={collapseDays}
         collapseToggle={collapseToggle}
+        mobileDayCollapsable={mobileDayCollapsable}
       />
     </div>
   );

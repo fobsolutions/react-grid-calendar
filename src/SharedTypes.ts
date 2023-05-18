@@ -10,7 +10,11 @@ export interface IViewProps {
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
-  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
+  mobileDayHeaderRenderer?: (
+    dayEvents: IDayEvents,
+    toggleDisplay?: () => void,
+    isShowing?: boolean
+  ) => ReactElement;
   editMode?: boolean;
   hideUnavailableTime?: boolean;
   gutterClassName?: string;
@@ -18,6 +22,7 @@ export interface IViewProps {
   scrollToToday?: boolean;
   collapseDays?: boolean;
   collapseToggle?: (collapsed: boolean) => ReactElement;
+  mobileDayCollapsable?: boolean;
 }
 
 // TODO: merge with above ^ IViewProps
@@ -29,7 +34,10 @@ export interface IGridDayProps {
   eventOnClick?: (event: IEvent) => void;
   cellOnClick?: (columnData: unknown, date: Date) => void;
   columnHeaderRenderer?: (column: IGridColumn) => ReactElement;
-  mobileDayHeaderRenderer?: (dayEvents: IDayEvents) => ReactElement;
+  mobileDayHeaderRenderer?: (
+    dayEvents: IDayEvents,
+    toggleDisplay?: () => void
+  ) => ReactElement;
   editMode?: boolean;
   hideUnavailableTime?: boolean;
   weekMode?: boolean;

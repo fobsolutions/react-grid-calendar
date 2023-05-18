@@ -79,6 +79,7 @@ WeekView.args = {
   events: weekEvents(),
   locale: 'en',
   hideUnavailableTime: true,
+  mobileDayCollapsable: true,
   displayDate: moment().subtract(2, 'weeks').toDate(),
   eventOnClick: (eventId: string) => {
     console.log('clicked on ' + eventId);
@@ -139,14 +140,26 @@ WeekView.args = {
       </div>
     );
   },
-  mobileDayHeaderRenderer: (e: IDayEvents) => {
+  mobileDayHeaderRenderer: (
+    e: IDayEvents,
+    toggleDisplay?: () => void,
+    isShowing?: boolean
+  ) => {
     return (
       <div className="mobile-header">
         <div className="mobile-header-divider">
           <hr />
         </div>
         <div className="mobile-header-title">
-          {moment(e.date).format('dddd D.MM')}
+          {isShowing ? 'V ' : '^ '}
+          <a
+            role="button"
+            onClick={() => {
+              toggleDisplay && toggleDisplay();
+            }}
+          >
+            {moment(e.date).format('dddd D.MM')}
+          </a>
         </div>
         <div className="mobile-header-divider">
           <hr />

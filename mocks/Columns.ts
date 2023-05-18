@@ -10,35 +10,7 @@ import {
 export const columnsMock: Array<IGridColumn> = [
   {
     label: 'Court 1',
-    events: [
-      {
-        eventId: '9797-8366-3031',
-        startDate: moment('2023-03-01T06:00:00.000Z').toDate(),
-        endDate: moment('2023-03-01T07:30:00.000Z').toDate(),
-        label: 'Level 4',
-        backgroundColor: '#a9a73f',
-        labelClass: '',
-        columnId: 'WE52r7',
-      },
-      {
-        eventId: '7114-7209-7160',
-        startDate: moment('2023-03-02T06:00:00.000Z').toDate(),
-        endDate: moment('2023-03-02T09:00:00.000Z').toDate(),
-        label: 'Level 1',
-        backgroundColor: '#e23499',
-        labelClass: '',
-        columnId: 'WE52r7',
-      },
-      {
-        eventId: '9813-5868-6732',
-        startDate: moment('2023-03-03T06:00:00.000Z').toDate(),
-        endDate: moment('2023-03-03T06:30:00.000Z').toDate(),
-        label: 'Level 7',
-        backgroundColor: '#26658a',
-        labelClass: '',
-        columnId: 'WE52r7',
-      },
-    ],
+    events: [],
     columnData: { id: '0000-0000-0000', name: 'Court 1' },
     availability: [
       { weekDay: 1, startTime: '06:00', endTime: '10:00' },
