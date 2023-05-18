@@ -162,8 +162,13 @@ const WeekGridDay = (props: IGridDayProps) => {
         `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
       );
 
+      const eventEndDate = moment(e.endDate);
+
       const endGridElement = refMap.current.get(
-        `${moment(e.endDate)
+        `${(eventEndDate.isSame(moment(e.endDate).startOf('day')) // For events that end at midnight we need to add one more day to make sure they are displayed correctly.
+          ? eventEndDate.add(1, 'day')
+          : eventEndDate
+        )
           .subtract(30, 'minutes') // TODO: use a step property instead of 30 minutes
           .format(refDateFormat)}-${e.columnId}`
       );
@@ -371,8 +376,8 @@ const WeekGridDay = (props: IGridDayProps) => {
       cols.map((col) =>
         col.events.map((ev) =>
           cellTime.clone().set({
-            hours: ev.endDate.getHours(),
-            minutes: ev.endDate.getMinutes(),
+            hours: ev.endDate.getHours() === 0 ? 23 : ev.endDate.getHours(),
+            minutes: ev.endDate.getHours() === 0 ? 59 : ev.endDate.getMinutes(),
           })
         )
       )
