@@ -31,6 +31,7 @@ export interface CalendarProps {
   collapseDays?: boolean;
   collapseToggle?: (collapsed: boolean) => ReactElement;
   mobileDayCollapsable?: boolean;
+  collapseAll?: boolean;
 }
 
 const Calendar = (props: CalendarProps) => {
@@ -54,11 +55,11 @@ const Calendar = (props: CalendarProps) => {
     collapseDays,
     collapseToggle,
     mobileDayCollapsable,
+    collapseAll,
   } = props;
 
   // this sets the moment.js locale for entire package
   moment.locale(locale);
-  // moment.tz.setDefault('Europe/London');
 
   const CalendarView = Views[getViewFromString(view)];
 
@@ -82,6 +83,7 @@ const Calendar = (props: CalendarProps) => {
         collapseDays={collapseDays}
         collapseToggle={collapseToggle}
         mobileDayCollapsable={mobileDayCollapsable}
+        collapseAll={collapseAll}
       />
     </div>
   );

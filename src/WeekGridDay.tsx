@@ -50,6 +50,7 @@ const WeekGridDay = (props: IGridDayProps) => {
     classNames,
     scrollToEarliest = true,
     collapseDays = true,
+    collapseAll = false,
     collapseToggle,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
@@ -308,6 +309,10 @@ const WeekGridDay = (props: IGridDayProps) => {
   useEffect(() => {
     redrawEvents();
   }, [isHidden]);
+
+  useEffect(() => {
+    setIsHidden(collapseAll);
+  }, [collapseAll]);
 
   const redrawEvents = () => {
     const flatEvents = flatten(
