@@ -146,7 +146,9 @@ const WeekGridDay = (props: IGridDayProps) => {
             moment(e.endDate).isValid() &&
             startMoment.isBetween(
               moment(day).startOf('day'),
-              moment(day).endOf('day')
+              moment(day).endOf('day'),
+              undefined,
+              '[]'
             )
           );
         });
