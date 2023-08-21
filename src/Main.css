@@ -28,10 +28,6 @@
   -webkit-border-radius: 5px;
   border-radius: 5px;
 }
-.scroll-panel::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
 .grid-container-events {
   position: relative;
 }
