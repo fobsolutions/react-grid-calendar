@@ -11286,6 +11286,11 @@
   "resolved" "https://registry.npmjs.org/os-tmpdir/-/os-tmpdir-1.0.2.tgz"
   "version" "1.0.2"
 
+"overlayscrollbars@^2.2.1":
+  "integrity" "sha512-5oMxq4UCiEVLiOSvovbX8p+P2NtPosjHC0KkIcaobnYuxGwMyTOwBCtBdqO1tXrrA02VVrNzuIjGMLisO2mIwg=="
+  "resolved" "https://registry.npmjs.org/overlayscrollbars/-/overlayscrollbars-2.2.1.tgz"
+  "version" "2.2.1"
+
 "p-all@^2.1.0":
   "integrity" "sha512-HbZxz5FONzz/z2gJfk6bFca0BCiSRF8jU3yCsWOen/vR6lZjfPOu/e7L3uFzTW1i0H8TlC3vqQstEJPQL4/uLA=="
   "resolved" "https://registry.npmjs.org/p-all/-/p-all-2.1.0.tgz"

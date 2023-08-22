@@ -44,6 +44,9 @@
   display: flex;
   flex: 1;
 }
+.grid-header-cols > div {
+  display: flex;
+}
 .day-grid-cols {
   flex: 1;
   position: relative;

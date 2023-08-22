@@ -2,6 +2,7 @@ import moment from 'moment-timezone';
 import React, { ReactElement } from 'react';
 import { IDayEvents, IEvent, IGridColumn } from './SharedTypes';
 import Views, { getViewFromString } from './Views';
+import './Overlayscrollbars.css';
 import './Main.css';
 
 export interface CalendarProps {

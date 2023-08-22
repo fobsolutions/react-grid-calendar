@@ -32,6 +32,11 @@ import {
 } from './SharedTypes';
 import { checkForEvents, isCollapsed } from './util';
 
+import {
+  OverlayScrollbars,
+  Options as OverlayScrollbarsOptions,
+} from 'overlayscrollbars';
+
 /**
  * Week Grid view day component
  */
@@ -57,6 +62,10 @@ const WeekGridDay = (props: IGridDayProps) => {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [gaps, setGaps] = useState<ITimeGap[]>([]);
   const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [gridHeadrColsScroll, setGridHeadrColsScroll] =
+    useState<OverlayScrollbars>();
+  const [gridScroll, setGridScroll] = useState<OverlayScrollbars>();
+
   const gridWrapper = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const gridHeadrCols = useRef<HTMLDivElement>(null);
@@ -304,8 +313,56 @@ const WeekGridDay = (props: IGridDayProps) => {
         gridWrapper?.current?.scrollTo({
           top: firstElementTop,
         });
+
+        gridScroll &&
+          (gridScroll.elements().viewport as unknown as Element).scrollTo({
+            top: firstElementTop,
+          });
       }
     }
+
+    // scrollbars
+    if (gridHeadrCols.current) {
+      setGridHeadrColsScroll(
+        OverlayScrollbars(
+          gridHeadrCols.current,
+          {
+            overflow: {
+              x: 'scroll',
+            },
+            scrollbars: {
+              autoHide: 'move',
+            },
+          } as unknown as OverlayScrollbarsOptions,
+          {
+            scroll: (_, e) => {
+              scrollGrid(e as unknown as UIEvent);
+            },
+          }
+        )
+      );
+    }
+
+    gridWrapper.current &&
+      setGridScroll(
+        OverlayScrollbars(
+          gridWrapper.current,
+          {
+            overflow: {
+              x: 'scroll',
+              y: 'scroll',
+            },
+            scrollbars: {
+              autoHide: 'move',
+            },
+          } as unknown as OverlayScrollbarsOptions,
+          {
+            scroll: (_, e) => {
+              scrollHeader(e as unknown as UIEvent);
+            },
+          }
+        )
+      );
   }, [events]);
 
   useEffect(() => {
@@ -331,9 +388,11 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   const scrollHeader = (event: UIEvent) => {
-    gridHeadrCols?.current?.scrollTo({
-      left: (event.target as Element).scrollLeft,
-    });
+    if (gridHeadrColsScroll) {
+      (
+        gridHeadrColsScroll.elements().viewport as unknown as Element
+      ).scrollLeft = (event.target as Element).scrollLeft;
+    }
   };
 
   const cellAvailable = (
@@ -669,9 +728,10 @@ const WeekGridDay = (props: IGridDayProps) => {
           </div>
         </div>
         <div
-          className="grid-header-cols scroll-panel"
+          className="grid-header-cols"
           ref={gridHeadrCols}
           onScroll={scrollGrid}
+          data-overlayscrollbars-initialize
         >
           {columns?.map((c: IGridColumn, i: number) => (
             <div key={`column-${i}`} className="day-grid-cell day-grid-col">
@@ -681,6 +741,7 @@ const WeekGridDay = (props: IGridDayProps) => {
         </div>
       </div>
       <div
+        data-overlayscrollbars-initialize
         className={`day-container scroll-panel${isHidden ? ' hidden' : ''}`}
         ref={gridWrapper}
       >
