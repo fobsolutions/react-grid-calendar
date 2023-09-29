@@ -21,6 +21,7 @@ const WeekGridView = (props: IViewProps) => {
     scrollToEarliest,
     collapseDays,
     collapseToggle,
+    collapseAll,
   } = props;
   const weekDays = getWeekDays(selectedDate);
   return (
@@ -41,6 +42,7 @@ const WeekGridView = (props: IViewProps) => {
           scrollToEarliest={scrollToEarliest}
           collapseDays={collapseDays}
           collapseToggle={collapseToggle}
+          collapseAll={collapseAll}
         />
       ))}
     </div>

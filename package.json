@@ -1,5 +1,5 @@
 {
-  "version": "0.1.50",
+  "version": "0.1.66",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -94,7 +94,8 @@
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
-    "nanoid": "3.3.4"
+    "nanoid": "3.3.4",
+    "overlayscrollbars": "^2.2.1"
   },
   "eslintIgnore": [
     "*.test.tsx",

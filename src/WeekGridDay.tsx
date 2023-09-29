@@ -1,11 +1,4 @@
-import React, {
-  createRef,
-  RefObject,
-  UIEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { UIEvent, useEffect, useRef, useState } from 'react';
 import {
   times,
   flatten,
@@ -32,6 +25,11 @@ import {
 } from './SharedTypes';
 import { checkForEvents, isCollapsed } from './util';
 
+import {
+  OverlayScrollbars,
+  Options as OverlayScrollbarsOptions,
+} from 'overlayscrollbars';
+
 /**
  * Week Grid view day component
  */
@@ -50,19 +48,25 @@ const WeekGridDay = (props: IGridDayProps) => {
     classNames,
     scrollToEarliest = true,
     collapseDays = true,
+    collapseAll = false,
     collapseToggle,
   } = props;
   const [gridColumns, setGridColumns] = useState<IGridColumn[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [gaps, setGaps] = useState<ITimeGap[]>([]);
   const [isHidden, setIsHidden] = useState<boolean>(false);
+  const [gridHeadrColsScroll, setGridHeadrColsScroll] =
+    useState<OverlayScrollbars>();
+  const [gridScroll, setGridScroll] = useState<OverlayScrollbars>();
+  const [wrapperRect, setWrapperRect] = useState<{
+    top: number;
+    left: number;
+  }>();
+
   const gridWrapper = useRef<HTMLDivElement>(null);
   const grid = useRef<HTMLDivElement>(null);
   const gridHeadrCols = useRef<HTMLDivElement>(null);
   const dayGridCols = useRef<HTMLDivElement>(null);
-  const refMap = useRef<Map<string, RefObject<unknown>>>(
-    new Map<string, RefObject<unknown>>()
-  );
   const refDateFormat = 'yyyyMMDDHHmm'; // the moment.js format to use for formatting to find refs
 
   /**
@@ -145,7 +149,9 @@ const WeekGridDay = (props: IGridDayProps) => {
             moment(e.endDate).isValid() &&
             startMoment.isBetween(
               moment(day).startOf('day'),
-              moment(day).endOf('day')
+              moment(day).endOf('day'),
+              undefined,
+              '[]'
             )
           );
         });
@@ -158,13 +164,13 @@ const WeekGridDay = (props: IGridDayProps) => {
    */
   const positionEvents = (eventList: IEvent[]): IEvent[] => {
     return eventList.map((e: IEvent) => {
-      const gridElement = refMap.current.get(
+      const gridElement = document.getElementById(
         `${moment(e.startDate).format(refDateFormat)}-${e.columnId}`
       );
 
       const eventEndDate = moment(e.endDate);
 
-      const endGridElement = refMap.current.get(
+      const endGridElement = document.getElementById(
         `${(eventEndDate.isSame(moment(e.endDate).startOf('day')) // For events that end at midnight we need to add one more day to make sure they are displayed correctly.
           ? eventEndDate.add(1, 'day')
           : eventEndDate
@@ -189,9 +195,9 @@ const WeekGridDay = (props: IGridDayProps) => {
       return {
         ...e,
         rect: getElementRect(
-          gridElement?.current as HTMLElement,
+          gridElement as HTMLElement,
           overlappingEvents,
-          endGridElement?.current as HTMLElement,
+          endGridElement as HTMLElement,
           e
         ),
       } as IEvent;
@@ -286,28 +292,109 @@ const WeekGridDay = (props: IGridDayProps) => {
         ? moment.min(startDates)
         : moment(day).hours(8).minutes(0);
 
-      const firstEvent: RefObject<HTMLDivElement> = refMap.current.get(
-        earliest.format(refDateFormat)
-      ) as RefObject<HTMLDivElement>;
+      const getElement = async () => {
+        return await getElementByIdAsync(earliest.format(refDateFormat));
+      };
 
-      const parentOffsetTop =
-        gridWrapper?.current?.getBoundingClientRect().top || 0;
-      const firstEventOffsetTop =
-        firstEvent?.current?.getBoundingClientRect().top || 0;
+      getElement().then((value) => {
+        setWrapperRect((value as Element).getBoundingClientRect());
 
-      const firstElementTop: number = firstEventOffsetTop - parentOffsetTop;
+        const parentOffsetTop =
+          gridWrapper?.current?.getBoundingClientRect().top || 0;
+        const firstEventOffsetTop =
+          (value as Element).getBoundingClientRect().top || 0;
 
-      if (firstElementTop !== 0) {
-        gridWrapper?.current?.scrollTo({
-          top: firstElementTop,
-        });
-      }
+        const firstElementTop: number = firstEventOffsetTop - parentOffsetTop;
+
+        if (firstElementTop !== 0) {
+          gridWrapper?.current?.scrollTo({
+            top: firstElementTop,
+          });
+
+          gridScroll &&
+            (gridScroll.elements().viewport as unknown as Element).scrollTo({
+              top: firstElementTop,
+            });
+        }
+      });
     }
+    const getElement = async () => {
+      return await getElementByIdAsync('day-wrapper');
+    };
+
+    getElement().then((value) => {
+      setWrapperRect((value as Element).getBoundingClientRect());
+    });
   }, [events]);
+
+  const getElementByIdAsync = (id: string) =>
+    new Promise((resolve) => {
+      const getElement = () => {
+        const element = document.getElementById(id);
+        if (element) {
+          resolve(element);
+        } else {
+          requestAnimationFrame(getElement);
+        }
+      };
+      getElement();
+    });
+
+  // create scrollbars
+  useEffect(() => {
+    if (!wrapperRect) {
+      return;
+    }
+    if (gridHeadrCols.current) {
+      setGridHeadrColsScroll(
+        OverlayScrollbars(
+          gridHeadrCols.current,
+          {
+            overflow: {
+              x: 'scroll',
+            },
+            scrollbars: {
+              autoHide: 'move',
+            },
+          } as unknown as OverlayScrollbarsOptions,
+          {
+            scroll: (_, e) => {
+              scrollGrid(e as unknown as UIEvent);
+            },
+          }
+        )
+      );
+    }
+
+    gridWrapper.current &&
+      setGridScroll(
+        OverlayScrollbars(
+          gridWrapper.current,
+          {
+            overflow: {
+              x: 'scroll',
+              y: 'scroll',
+            },
+            scrollbars: {
+              autoHide: 'move',
+            },
+          } as unknown as OverlayScrollbarsOptions,
+          {
+            scroll: (_, e) => {
+              scrollHeader(e as unknown as UIEvent);
+            },
+          }
+        )
+      );
+  }, [wrapperRect]);
 
   useEffect(() => {
     redrawEvents();
   }, [isHidden]);
+
+  useEffect(() => {
+    setIsHidden(collapseAll);
+  }, [collapseAll]);
 
   const redrawEvents = () => {
     const flatEvents = flatten(
@@ -324,9 +411,11 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   const scrollHeader = (event: UIEvent) => {
-    gridHeadrCols?.current?.scrollTo({
-      left: (event.target as Element).scrollLeft,
-    });
+    if (gridHeadrColsScroll) {
+      (
+        gridHeadrColsScroll.elements().viewport as unknown as Element
+      ).scrollLeft = (event.target as Element).scrollLeft;
+    }
   };
 
   const cellAvailable = (
@@ -408,11 +497,6 @@ const WeekGridDay = (props: IGridDayProps) => {
         .hour(i)
         .minutes(30); // TODO: use a step property instead of 30 minutes
 
-      const hourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.current.set(h.format(refDateFormat), hourRef);
-      const halfHourRef: RefObject<HTMLDivElement> = createRef();
-      refMap.current.set(m.format(refDateFormat), halfHourRef);
-
       // see if the hour needs to be skipped:
       if (hideUnavailableTime) {
         const hourUnavailable = weekMode
@@ -456,10 +540,10 @@ const WeekGridDay = (props: IGridDayProps) => {
               gutterClassName || ''
             } day-grid-cell day-grid-gutter day-grid-hour`}
           >
-            <div className="time-half-hour" ref={hourRef}>
+            <div className="time-half-hour" id={h.format(refDateFormat)}>
               {h.format('H:mm')}
             </div>
-            <div ref={halfHourRef}>{m.format('H:mm')}</div>
+            <div id={m.format(refDateFormat)}>{m.format('H:mm')}</div>
           </div>
         </div>
       );
@@ -527,19 +611,6 @@ const WeekGridDay = (props: IGridDayProps) => {
                     ? moment(c.date).hour(m.hour()).minute(m.minute())
                     : m;
 
-                  const hourCellRef: RefObject<HTMLDivElement> = createRef();
-                  refMap.current.set(
-                    `${cellHour.format(refDateFormat)}-${c.id}`,
-                    hourCellRef
-                  );
-
-                  const halfHourCellRef: RefObject<HTMLDivElement> =
-                    createRef();
-                  refMap.current.set(
-                    `${cellHalfHour.format(refDateFormat)}-${c.id}`,
-                    halfHourCellRef
-                  );
-
                   let isHourClickable = true;
                   let isHalfHourClickable = true;
                   let hourUnavailable = false;
@@ -592,7 +663,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                           !isHourClickable ? 'cell-disabled' : ''
                         }`}
                         key={`column-hour-${i}`}
-                        ref={hourCellRef}
+                        id={`${cellHour.format(refDateFormat)}-${c.id}`}
                         onClick={() => {
                           if (cellOnClick && isHourClickable) {
                             cellOnClick(c.columnData, cellHour.toDate());
@@ -604,7 +675,7 @@ const WeekGridDay = (props: IGridDayProps) => {
                           !isHalfHourClickable ? 'cell-disabled' : ''
                         }`}
                         key={`column-half-hour-${i}`}
-                        ref={halfHourCellRef}
+                        id={`${cellHalfHour.format(refDateFormat)}-${c.id}`}
                         onClick={() => {
                           if (cellOnClick && isHalfHourClickable) {
                             cellOnClick(c.columnData, cellHalfHour.toDate());
@@ -623,7 +694,7 @@ const WeekGridDay = (props: IGridDayProps) => {
   };
 
   return (
-    <div className={`day-wrapper ${classNames}`}>
+    <div id="day-wrapper" className={`day-wrapper ${classNames}`}>
       <div className="day-grid-row">
         <div>
           <div
@@ -662,9 +733,10 @@ const WeekGridDay = (props: IGridDayProps) => {
           </div>
         </div>
         <div
-          className="grid-header-cols scroll-panel"
+          className="grid-header-cols"
           ref={gridHeadrCols}
           onScroll={scrollGrid}
+          data-overlayscrollbars-initialize
         >
           {columns?.map((c: IGridColumn, i: number) => (
             <div key={`column-${i}`} className="day-grid-cell day-grid-col">
@@ -674,6 +746,7 @@ const WeekGridDay = (props: IGridDayProps) => {
         </div>
       </div>
       <div
+        data-overlayscrollbars-initialize
         className={`day-container scroll-panel${isHidden ? ' hidden' : ''}`}
         ref={gridWrapper}
       >

@@ -21,6 +21,7 @@ export interface IViewProps {
   scrollToEarliest?: boolean;
   scrollToToday?: boolean;
   collapseDays?: boolean;
+  collapseAll?: boolean; // simply toggle the collapse
   collapseToggle?: (collapsed: boolean) => ReactElement;
   mobileDayCollapsable?: boolean;
 }
@@ -45,6 +46,7 @@ export interface IGridDayProps {
   scrollToEarliest?: boolean;
   classNames?: string;
   collapseDays?: boolean;
+  collapseAll?: boolean; // simply toggle the collapse
   collapseToggle?: (collapsed: boolean) => ReactElement;
 }
 
